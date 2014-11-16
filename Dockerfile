@@ -1,6 +1,6 @@
 # gui81/alfresco
 #
-# VERSION 5.0.b
+# VERSION 5.0.b-1
 
 FROM centos:centos7
 MAINTAINER Lucas Johnson <lucasejohnson@netscape.net>
@@ -30,7 +30,8 @@ RUN chmod 755 /alfresco/init.sh
 RUN yum clean all
 
 VOLUME /alfresco/alf_data
+VOLUME /alfresco/tomcat/logs
 
-EXPOSE 8080 8005 8443 8009 21 50500 7070 8100
+EXPOSE 21 137 138 139 445 7070 8080
 WORKDIR /alfresco
-CMD /alfresco/init.sh
+CMD /usr/bin/supervisord -c /etc/supervisord.conf -n

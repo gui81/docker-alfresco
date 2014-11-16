@@ -5,7 +5,7 @@ ALF_BIN=$ALF_HOME/bin
 ALF_SETUP=$ALF_HOME/setup
 CATALINA_HOME=$ALF_HOME/tomcat
 
-ALFRESCO_HOSTNAME=${ALFRESCO_HOSTNAME:-`hostname`}
+ALFRESCO_HOSTNAME=${ALFRESCO_HOSTNAME:-127.0.0.1}
 ALFRESCO_PROTOCOL=${ALFRESCO_PROTOCOL:-http}
 ALFRESCO_PORT=${ALFRESCO_PORT:-8080}
 if [ "${ALFRESCO_PROTOCOL,,}" = "https" ]; then
@@ -14,7 +14,7 @@ else
   ALFRESCO_PORT=${ALFRESCO_PORT:-8080}
 fi
 
-SHARE_HOSTNAME=${SHARE_HOSTNAME:-`hostname`}
+SHARE_HOSTNAME=${SHARE_HOSTNAME:-127.0.0.1}
 SHARE_PROTOCOL=${SHARE_PROTOCOL:-http}
 SHARE_PORT=${SHARE_PORT:-8080}
 if [ "${SHARE_PROTOCOL,,}" = "https" ]; then
@@ -126,9 +126,6 @@ tweak_alfresco
 # setup environment
 source $ALF_HOME/scripts/setenv.sh
 
-# start supervisor
-/usr/bin/supervisord -c /etc/supervisord.conf
-
 # start internal postgres server only if the host is localhost
 if [ "$DB_HOST" == "localhost" ]; then
   $ALF_HOME/postgresql/scripts/ctl.sh start
@@ -136,5 +133,4 @@ fi
 
 # start alfresco
 cd $CATALINA_HOME/logs
-#sudo -u alfresco $CATALINA_HOME/bin/catalina.sh run
 $CATALINA_HOME/bin/catalina.sh run

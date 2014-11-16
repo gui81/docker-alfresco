@@ -19,7 +19,7 @@ docker-alfresco
 Dockerfile to build an Alfresco container image.
 
 ## Version
-Current version: **5.0.b**
+Current version: **5.0.b-1**
 
 # Contributing
 Here is how you can help:
@@ -34,7 +34,7 @@ docker pull gui81/alfresco:latest
 
 or pull a particular version:
 ```bash
-docker pull gui81/alfresco:5.0.b
+docker pull gui81/alfresco:5.0.b-1
 ```
 
 Alternatively, you can build the image yourself:
@@ -69,7 +69,7 @@ Alfresco should now be up and running.  The following is an example that would
 mount the appropriate volume, connect to a remote PostgreSQL database, and use
 an external LDAP server for authentication:
 ```bash
-docker run --name='alfresco' -it --rm -p 8080:8080 \
+docker run --name='alfresco' -it --rm -p 445:445 -p 7070:7070 -p 8080:8080 \
     -v /host/alfresco_data:/alfresco/alf_data \
     -e 'LDAP_ENABLED=true' \
     -e 'LDAP_AUTH_USERNAMEFORMAT=uid=%s,cn=users,cn=accounts,dc=example,dc=com' \
