@@ -72,7 +72,7 @@ an external LDAP server for authentication:
 docker run --name='alfresco' -it --rm -p 445:445 -p 7070:7070 -p 8080:8080 \
     -v /host/alfresco_data:/alfresco/alf_data \
     -e 'LDAP_ENABLED=true' \
-    -e 'LDAP_AUTH_USERNAMEFORMAT=uid=%s,cn=users,cn=accounts,dc=example,dc=com' \
+    -e 'LDAP_AUTH_USERNAMEFORMAT=cn=users,cn=accounts,dc=example,dc=com' \
     -e 'LDAP_URL=ldap://ipa.example.com:389' \
     -e 'LDAP_DEFAULT_ADMINS=admin' \
     -e 'LDAP_SECURITY_PRINCIPAL=uid=admin,cn=users,cn=accounts,dc=example,dc=com' \
@@ -85,6 +85,11 @@ docker run --name='alfresco' -it --rm -p 445:445 -p 7070:7070 -p 8080:8080 \
     -e 'DB_NAME=alfresco' \
     gui81/alfresco
 ```
+
+**NOTE**: LDAP_AUTH_USERNAMEFORMAT is being prefixed with uid=%s,   This is a
+temporary fix so that it works when kicked off by fleet.  Running this only in
+docker it runs fine, but %s gets replaced with /bin/sh when kicked off by fleet.
+If anyone knows how to solve this, please let me know.
 
 If you want to use this image in production, then please read on.
 
