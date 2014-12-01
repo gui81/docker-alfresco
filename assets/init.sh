@@ -110,7 +110,7 @@ function tweak_alfresco {
     LDAP_CONFIG_FILE=$CATALINA_HOME/shared/classes/alfresco/extension/subsystems/Authentication/ldap/ldap1/ldap-authentication.properties
 
     # TODO(lej): prefixing with uid=%s, is a temp fix so that it works when kicked off by fleet
-    cfg_replace_option ldap.authentication.userNameFormat uid=%s,$LDAP_AUTH_USERNAMEFORMAT $LDAP_CONFIG_FILE
+    cfg_replace_option ldap.authentication.userNameFormat 'uid=%s,$LDAP_AUTH_USERNAMEFORMAT' $LDAP_CONFIG_FILE
     cfg_replace_option ldap.authentication.java.naming.provider.url $LDAP_URL $LDAP_CONFIG_FILE
     cfg_replace_option ldap.authentication.defaultAdministratorUserNames $LDAP_DEFAULT_ADMINS $LDAP_CONFIG_FILE
     cfg_replace_option ldap.synchronization.java.naming.security.principal $LDAP_SECURITY_PRINCIPAL $LDAP_CONFIG_FILE
