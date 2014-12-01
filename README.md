@@ -86,6 +86,12 @@ docker run --name='alfresco' -it --rm -p 445:445 -p 7070:7070 -p 8080:8080 \
     gui81/alfresco
 ```
 
+**NOTE**: If %s is going to be used in a fleet/systemd file, then make sure
+it actually is %%s so that this does not get substituted with the user shell.
+Fleet says that it only supports a subset of the systemd specifiers 
+(https://coreos.com/docs/launching-containers/launching/fleet-unit-files/#systemd-specifiers),
+but I can tell you that %s on the latest CoreOS is being substituted.
+
 If you want to use this image in production, then please read on.
 
 # Configuration
