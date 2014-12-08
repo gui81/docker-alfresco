@@ -4,7 +4,6 @@ docker-alfresco
 # Table of Contents
 
 - [Introduction](#introduction)
-  - [Version](#version)
 - [Contributing](#contributing)
 - [Installation](#installation)
 - [Quick Start](#quick-start)
@@ -17,9 +16,6 @@ docker-alfresco
 
 # Introduction
 Dockerfile to build an Alfresco container image.
-
-## Version
-Current version: **5.0.b-4**
 
 # Contributing
 Here is how you can help:
@@ -34,7 +30,7 @@ docker pull gui81/alfresco:latest
 
 or pull a particular version:
 ```bash
-docker pull gui81/alfresco:5.0.b-4
+docker pull gui81/alfresco:5.0.b-5
 ```
 
 Alternatively, you can build the image yourself:
@@ -88,7 +84,7 @@ docker run --name='alfresco' -it --rm -p 445:445 -p 7070:7070 -p 8080:8080 \
 
 **NOTE**: If %s is going to be used in a fleet/systemd file, then make sure
 it actually is %%s so that this does not get substituted with the user shell.
-Fleet says that it only supports a subset of the systemd specifiers 
+Fleet says that it only supports a subset of the systemd specifiers
 (https://coreos.com/docs/launching-containers/launching/fleet-unit-files/#systemd-specifiers),
 but I can tell you that %s on the latest CoreOS is being substituted.
 

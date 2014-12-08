@@ -1,6 +1,4 @@
 # gui81/alfresco
-#
-# VERSION 5.0.b-1
 
 FROM centos:centos7
 MAINTAINER Lucas Johnson <lucasejohnson@netscape.net>

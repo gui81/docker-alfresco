@@ -24,18 +24,6 @@ chmod +x $ALF_BIN
 rm $ALF_BIN
 
 # setup supervisor configs
-cat > /etc/supervisord.d/libreoffice.ini <<EOF
-[program:libreoffice]
-priority=20
-directory=/tmp
-command=/alfresco/libreoffice/program/.soffice.bin --nofirststartwizard --nologo --headless --accept=socket,host=localhost,port=8100\;urp\;
-user=root
-autostart=true
-autorestart=true
-stdout_logfile=/var/log/supervisor/%(program_name)s.log
-stderr_logfile=/var/log/supervisor/%(program_name)s.log
-EOF
-
 cat > /etc/supervisord.d/alfresco.ini <<EOF
 [program:alfresco]
 priority=20
