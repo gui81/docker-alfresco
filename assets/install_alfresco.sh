@@ -7,7 +7,7 @@ ALF_HOME=/alfresco
 ALF_BIN=alfresco-community-5.0.b-installer-linux-x64.bin
 
 # satisfy dependencies
-yum install -y http://download.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-2.noarch.rpm
+yum install -y http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
 yum install -y fontconfig libSM libICE libXrender libXext hostname libXinerama cups-libs dbus-glib
 yum install -y supervisor
 
