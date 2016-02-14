@@ -23,24 +23,38 @@ else
   SHARE_PORT=${SHARE_PORT:-8080}
 fi
 
+DB_KIND=${DB_KIND:-postgresql}
 DB_USERNAME=${DB_USERNAME:-alfresco}
 DB_PASSWORD=${DB_PASSWORD:-admin}
 DB_NAME=${DB_NAME:-alfresco}
 DB_HOST=${DB_HOST:-localhost}
-DB_PORT=${DB_PORT:-5432}
+case "${DB_KIND,,}" in
+  postgresql)
+    DB_DRIVER=org.postgresql.Driver
+    DB_PORT=${DB_PORT:-5432}
+    ;;
+  mysql)
+    DB_DRIVER=org.gjt.mm.mysql.Driver
+    DB_PORT=${DB_PORT:-3306}
+    DB_CONN_PARAMS=${DB_CONN_PARAMS:-?useSSL=false}
+    ;;
+  *)
+    echo "Database kind '$DB_KIND' not supported!"
+    exit 1
+esac
 
 SYSTEM_SERVERMODE=${SYSTEM_SERVERMODE:-PRODUCTION}
 
-MAIL_SMTP_HOST=${MAIL_SMTP_HOST:-localhost}
-MAIL_SMTP_PORT=${MAIL_SMTP_PORT:-25}
-MAIL_SMTP_USERNAME=${MAIL_SMTP_USERNAME:-}
-MAIL_SMTP_PASSWORD=${MAIL_SMTP_PASSWORD:-}
-MAIL_FROM=${MAIL_FROM:-alfresco@alfresco.org}
+MAIL_HOST=${MAIL_HOST:-localhost}
+MAIL_PORT=${MAIL_PORT:-25}
+MAIL_USERNAME=${MAIL_USERNAME:-}
+MAIL_PASSWORD=${MAIL_PASSWORD:-}
+MAIL_FROM_DEFAULT=${MAIL_FROM_DEFAULT:-alfresco@alfresco.org}
 MAIL_PROTOCOL=${MAIL_PROTOCOL:-smtp}
 MAIL_SMTP_AUTH=${MAIL_SMTP_AUTH:-false}
-MAIL_SMTP_STARTTLS=${MAIL_SMTP_STARTTLS:-false}
+MAIL_SMTP_STARTTLS_ENABLE=${MAIL_SMTP_STARTTLS_ENABLE:-false}
 MAIL_SMTPS_AUTH=${MAIL_SMTPS_AUTH:-false}
-MAIL_SMTPS_STARTTLS=${MAIL_SMTPS_STARTTLS:-false}
+MAIL_SMTPS_STARTTLS_ENABLE=${MAIL_SMTPS_STARTTLS_ENABLE:-false}
 
 FTP_PORT=${FTP_PORT:-21}
 
@@ -58,6 +72,8 @@ LDAP_SECURITY_PRINCIPAL=${LDAP_SECURITY_PRINCIPAL:-uid=admin,cn=users,cn=account
 LDAP_SECURITY_CREDENTIALS=${LDAP_SECURITY_CREDENTIALS:-password}
 LDAP_GROUP_SEARCHBASE=${LDAP_GROUP_SEARCHBASE:-cn=groups,cn=accounts,dc=example,dc=com}
 LDAP_USER_SEARCHBASE=${LDAP_USER_SEARCHBASE:-cn=users,cn=accounts,dc=example,dc=com}
+
+CONTENT_STORE=${CONTENT_STORE:-\$\{dir.root\}}
 
 function cfg_replace_option {
   grep "$1" "$3" > /dev/null
@@ -83,10 +99,22 @@ function tweak_alfresco {
   cfg_replace_option share.host $SHARE_HOSTNAME $ALFRESCO_GLOBAL_PROPERTIES
 
   #db.schema.update=true
+  cfg_replace_option db.driver $DB_DRIVER $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option db.username $DB_USERNAME $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option db.password $DB_PASSWORD $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option db.name $DB_NAME $ALFRESCO_GLOBAL_PROPERTIES
-  cfg_replace_option db.url jdbc:postgresql://$DB_HOST:$DB_PORT/$DB_NAME $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option db.url jdbc:${DB_KIND,,}://${DB_HOST}:${DB_PORT}/${DB_NAME}${DB_CONN_PARAMS} $ALFRESCO_GLOBAL_PROPERTIES
+
+  cfg_replace_option mail.host $MAIL_HOST $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.port $MAIL_PORT $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.username $MAIL_USERNAME $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.password $MAIL_PASSWORD $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.from.default $MAIL_FROM_DEFAULT $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.protocol $MAIL_PROTOCOL $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.smtp.auth $MAIL_SMTP_AUTH $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.smtp.starttls.enable $MAIL_SMTP_STARTTLS_ENABLE $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.smtps.auth $MAIL_SMTPS_AUTH $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.smtps.starttls.enable $MAIL_SMTPS_STARTTLS_ENABLE $ALFRESCO_GLOBAL_PROPERTIES
 
   cfg_replace_option ftp.port $FTP_PORT $ALFRESCO_GLOBAL_PROPERTIES
 
@@ -119,18 +147,33 @@ function tweak_alfresco {
   else
     cfg_replace_option authentication.chain "alfrescoNtlm1:alfrescoNtlm" $ALFRESCO_GLOBAL_PROPERTIES
   fi
+
+  # content store
+  cfg_replace_option dir.contentstore "${CONTENT_STORE}/contentstore" $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option dir.contentstore.deleted "${CONTENT_STORE}/contentstore.deleted" $ALFRESCO_GLOBAL_PROPERTIES
 }
 
 tweak_alfresco
+
+if [ -d "$AMP_DIR_ALFRESCO" ]; then
+  echo "Installing Alfresco AMPs from $AMP_DIR_ALFRESCO..."
+  $ALF_HOME/java/bin/java -jar $ALF_HOME/bin/alfresco-mmt.jar install $AMP_DIR_ALFRESCO $CATALINA_HOME/webapps/alfresco.war -directory -force -verbose
+  $ALF_HOME/java/bin/java -jar $ALF_HOME/bin/alfresco-mmt.jar list $CATALINA_HOME/webapps/alfresco.war
+fi
+
+if [ -d "$AMP_DIR_SHARE" ]; then
+  echo "Installing Share AMPs from $AMP_DIR_SHARE..."
+  $ALF_HOME/java/bin/java -jar $ALF_HOME/bin/alfresco-mmt.jar install $AMP_DIR_SHARE $CATALINA_HOME/webapps/share.war -directory -force -verbose
+  $ALF_HOME/java/bin/java -jar $ALF_HOME/bin/alfresco-mmt.jar list $CATALINA_HOME/webapps/share.war
+fi
 
 # setup environment
 source $ALF_HOME/scripts/setenv.sh
 
 # start internal postgres server only if the host is localhost
-if [ "$DB_HOST" == "localhost" ]; then
+if [ "${DB_KIND,,}" == "postgresql" ] && [ "$DB_HOST" == "localhost" ]; then
   $ALF_HOME/postgresql/scripts/ctl.sh start
 fi
 
 # start alfresco
-cd $CATALINA_HOME/logs
-$CATALINA_HOME/bin/catalina.sh run
+$ALF_HOME/tomcat/scripts/ctl.sh start
