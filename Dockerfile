@@ -22,19 +22,16 @@ RUN yum update -y && \
 
 # install java
 COPY assets/install_java.sh /tmp/install_java.sh
-RUN chmod 755 /tmp/install_java.sh && \
-    /tmp/install_java.sh && \
+RUN /tmp/install_java.sh && \
     rm -f /tmp/install_java.sh
 
 # install alfresco
 COPY assets/install_alfresco.sh /tmp/install_alfresco.sh
-RUN chmod 755 /tmp/install_alfresco.sh && \
-    /tmp/install_alfresco.sh && \
+RUN /tmp/install_alfresco.sh && \
     rm -f /tmp/install_alfresco.sh
 # install mysql connector for alfresco
 COPY assets/install_mysql_connector.sh /tmp/install_mysql_connector.sh
-RUN chmod 755 /tmp/install_mysql_connector.sh && \
-    /tmp/install_mysql_connector.sh && \
+RUN /tmp/install_mysql_connector.sh && \
     rm -f /tmp/install_mysql_connector.sh
 # this is for LDAP configuration
 RUN mkdir -p /alfresco/tomcat/shared/classes/alfresco/extension/subsystems/Authentication/ldap/ldap1/
@@ -42,7 +39,6 @@ COPY assets/ldap-authentication.properties /alfresco/tomcat/shared/classes/alfre
 
 # install scripts
 COPY assets/init.sh /alfresco/init.sh
-RUN chmod 755 /alfresco/init.sh
 COPY assets/supervisord.conf /etc/supervisord.conf
 
 VOLUME /alfresco/tomcat/logs
