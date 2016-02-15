@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ALF_HOME=/alfresco
 ALF_BIN=$ALF_HOME/bin

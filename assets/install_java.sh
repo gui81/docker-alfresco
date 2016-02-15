@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 set -e
 
 JAVA_RPM=jdk-8u73-linux-x64.rpm
