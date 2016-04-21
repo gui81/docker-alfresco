@@ -75,6 +75,9 @@ LDAP_USER_SEARCHBASE=${LDAP_USER_SEARCHBASE:-cn=users,cn=accounts,dc=example,dc=
 
 CONTENT_STORE=${CONTENT_STORE:-\$\{dir.root\}}
 
+TOMCAT_CSRF_PATCH="${ALF_HOME}/disable_tomcat_CSRF.patch"
+TOMCAT_CSRF_ENABLED=${TOMCAT_CSRF_ENABLED:-true}
+
 function cfg_replace_option {
   grep "$1" "$3" > /dev/null
   if [ $? -eq 0 ]; then
@@ -97,6 +100,9 @@ function tweak_alfresco {
 
   cfg_replace_option alfresco.host $ALFRESCO_HOSTNAME $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option share.host $SHARE_HOSTNAME $ALFRESCO_GLOBAL_PROPERTIES
+
+  #set server mode
+  cfg_replace_option system.serverMode $SYSTEM_SERVERMODE $ALFRESCO_GLOBAL_PROPERTIES
 
   #db.schema.update=true
   cfg_replace_option db.driver $DB_DRIVER $ALFRESCO_GLOBAL_PROPERTIES
@@ -173,6 +179,13 @@ source $ALF_HOME/scripts/setenv.sh
 # start internal postgres server only if the host is localhost
 if [ "${DB_KIND,,}" == "postgresql" ] && [ "$DB_HOST" == "localhost" ]; then
   $ALF_HOME/postgresql/scripts/ctl.sh start
+fi
+
+#disable CSRF if needed
+#rename the patch to prevent reuse
+if [ "$TOMCAT_CSRF_ENABLED" == "false" ] && [ -f "$TOMCAT_CSRF_PATCH" ] ;then
+  patch -Np0 < $TOMCAT_CSRF_PATCH
+  [ $? == 0 ] && mv "$TOMCAT_CSRF_PATCH" "${TOMCAT_CSRF_PATCH}.done"
 fi
 
 # start alfresco

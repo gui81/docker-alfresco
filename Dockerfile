@@ -17,7 +17,8 @@ RUN yum update -y && \
                    libXinerama \
                    libXrender \
                    supervisor \
-                   wget && \
+                   wget \
+									 patch && \
     yum clean all
 
 # install java
@@ -36,6 +37,9 @@ RUN /tmp/install_mysql_connector.sh && \
 # this is for LDAP configuration
 RUN mkdir -p /alfresco/tomcat/shared/classes/alfresco/extension/subsystems/Authentication/ldap/ldap1/
 COPY assets/ldap-authentication.properties /alfresco/tomcat/shared/classes/alfresco/extension/subsystems/Authentication/ldap/ldap1/ldap-authentication.properties
+
+# adding path file used to disable tomcat CSRF
+COPY assets/disable_tomcat_CSRF.patch /alfresco/disable_tomcat_CSRF.patch
 
 # install scripts
 COPY assets/init.sh /alfresco/init.sh
