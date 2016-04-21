@@ -71,7 +71,7 @@ an external LDAP server for authentication:
 ```bash
 docker run --name='alfresco' -it --rm -p 445:445 -p 7070:7070 -p 8080:8080 \
     -v /host/alfresco_data:/alfresco/alf_data \
-    -e 'CONTENT_STORE=/alfresco/alf_data' \
+    -e 'CONTENT_STORE=/content' \
     -e 'LDAP_ENABLED=true' \
     -e 'LDAP_AUTH_USERNAMEFORMAT=uid=%s,cn=users,cn=accounts,dc=example,dc=com' \
     -e 'LDAP_URL=ldap://ipa.example.com:389' \
@@ -95,14 +95,16 @@ If you want to use this image in production, then please read on.
 ## Datastore
 To persist data, you will want to make sure to specify and mount the
 CONTENT_STORE, example:
-* `/alfresco/alf_data`
+* `/content`
 
 Volumes can be mounted by passing the **'-v'** option to the docker run command.
 The following is an example:
 ```bash
-docker run --name alfresco -it --rm -v /host/alfresco_data:/alfresco/alf_data
+docker run --name alfresco -it --rm -v /host/alfresco_data:/content
 ```
-
+:warning:<br>
+The directory "/alfresco/alf_data" in this container already have data (keystore,...).<br>
+If you mount a volume at this location using "-v", alfresco may not work.
 
 ## Database
 If the `DB_HOST` environment variable is not set, or set to localhost, then the
@@ -122,6 +124,8 @@ GRANT ALL PRIVILEGES ON DATABASE alfresco TO alfresco;
 Below is the complete list of currently available parameters that can be set
 using environment variables.
 - **ALFRESCO_HOSTNAME**: hostname of the Alfresco server; default = `localhost`
+- **ALFRESCO_PORT**: port for afresco to listen to; default = `8080` if protocol is http or `8443` if protocol is https
+- **ALFRESCO_PROTOCOL**: protocol use by alfresco to generate links; default = `http`
 - **CIFS_ENABLED**: whether or not to enable CIFS; default = `true`
 - **CIFS_SERVER_NAME**: hostname of the CIFS server; default = `localhost`
 - **CIFS_DOMAIN**: domain of the CIFS server; default = `WORKGROUP`
@@ -152,6 +156,10 @@ using environment variables.
 - **MAIL_SMTPS_STARTTLS_ENABLE**: use starttls or not; default = `false`
 - **NFS_ENABLED**: whether or not to enable NFS; default = `true`
 - **SHARE_HOSTNAME**: hostname of the share server; default = `localhost`
+- **SHARE_PORT**: port for share to listen to; default = `8080` if protocol is http or `8443` if protocol is https
+- **SHARE_PROTOCOL**: protocol use by share to generate links; default = `http`
+- **SYSTEM_SERVERMODE**: the server running mode for you system; default = `PRODUCTION`
+- **TOMCAT_CSRF_ENABLED**: Disable the tomcat CSRF policy, values: `true` or `false`; default = `false`
 
 
 # Upgrading
