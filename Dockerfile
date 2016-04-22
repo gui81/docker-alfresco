@@ -18,7 +18,7 @@ RUN yum update -y && \
                    libXrender \
                    supervisor \
                    wget \
-									 patch && \
+                   patch && \
     yum clean all
 
 # install java

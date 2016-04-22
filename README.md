@@ -70,7 +70,7 @@ mount the appropriate volume, connect to a remote PostgreSQL database, and use
 an external LDAP server for authentication:
 ```bash
 docker run --name='alfresco' -it --rm -p 445:445 -p 7070:7070 -p 8080:8080 \
-    -v '/host/alfresco_data:/alfresco/alf_data' \
+    -v '/host/alfresco_data:/content' \
     -e 'CONTENT_STORE=/content' \
     -e 'LDAP_ENABLED=true' \
     -e 'LDAP_AUTH_USERNAMEFORMAT=uid=%s,cn=users,cn=accounts,dc=example,dc=com' \
