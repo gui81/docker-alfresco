@@ -1,0 +1,14 @@
+--- /alfresco/tomcat/shared/classes/alfresco/web-extension/share-config-custom.xml	2016-04-19 16:28:52.044733885 +0200
++++ /alfresco/tomcat/shared/classes/alfresco/web-extension/share-config-custom.xml.new	2016-04-19 16:27:11.833719429 +0200
+@@ -37,11 +37,9 @@
+    </config>
+ 
+    <!-- Disable the CSRF Token Filter -->
+-   <!--
+    <config evaluator="string-compare" condition="CSRFPolicy" replace="true">
+       <filter/>
+    </config>
+-   -->
+ 
+    <!--
+       To run the CSRF Token Filter behind 1 or more proxies that do not rewrite the Origin or Referere headers:

@@ -7,20 +7,27 @@ CATALINA_HOME=$ALF_HOME/tomcat
 
 ALFRESCO_HOSTNAME=${ALFRESCO_HOSTNAME:-127.0.0.1}
 ALFRESCO_PROTOCOL=${ALFRESCO_PROTOCOL:-http}
-ALFRESCO_PORT=${ALFRESCO_PORT:-8080}
-if [ "${ALFRESCO_PROTOCOL,,}" = "https" ]; then
-  ALFRESCO_PORT=${ALFRESCO_PORT:-8443}
-else
-  ALFRESCO_PORT=${ALFRESCO_PORT:-8080}
+ALFRESCO_PORT=${ALFRESCO_PORT:-null}
+#do not change alfresco_port if specified as environment variable
+if [ "$ALFRESCO_PORT" == 'null'] ;then
+  if [ "${ALFRESCO_PROTOCOL,,}" = "https" ]; then
+    ALFRESCO_PORT=${ALFRESCO_PORT:-8443}
+  else
+    ALFRESCO_PORT=${ALFRESCO_PORT:-8080}
+  fi
 fi
+
 
 SHARE_HOSTNAME=${SHARE_HOSTNAME:-127.0.0.1}
 SHARE_PROTOCOL=${SHARE_PROTOCOL:-http}
-SHARE_PORT=${SHARE_PORT:-8080}
-if [ "${SHARE_PROTOCOL,,}" = "https" ]; then
-  SHARE_PORT=${SHARE_PORT:-8443}
-else
-  SHARE_PORT=${SHARE_PORT:-8080}
+SHARE_PORT=${SHARE_PORT:-null}
+#do not change share_port if specified as environment variable
+if [ "$SHARE_PORT" == 'null'] ;then
+  if [ "${SHARE_PROTOCOL,,}" = "https" ]; then
+    SHARE_PORT=${SHARE_PORT:-8443}
+  else
+    SHARE_PORT=${SHARE_PORT:-8080}
+  fi
 fi
 
 DB_KIND=${DB_KIND:-postgresql}
@@ -75,6 +82,9 @@ LDAP_USER_SEARCHBASE=${LDAP_USER_SEARCHBASE:-cn=users,cn=accounts,dc=example,dc=
 
 CONTENT_STORE=${CONTENT_STORE:-\$\{dir.root\}}
 
+TOMCAT_CSRF_PATCH="${ALF_HOME}/disable_tomcat_CSRF.patch"
+TOMCAT_CSRF_ENABLED=${TOMCAT_CSRF_ENABLED:-true}
+
 function cfg_replace_option {
   grep "$1" "$3" > /dev/null
   if [ $? -eq 0 ]; then
@@ -95,8 +105,18 @@ function cfg_replace_option {
 function tweak_alfresco {
   ALFRESCO_GLOBAL_PROPERTIES=$CATALINA_HOME/shared/classes/alfresco-global.properties
 
+  #alfresco host+proto+port
   cfg_replace_option alfresco.host $ALFRESCO_HOSTNAME $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option alfresco.protocol $ALFRESCO_PROTOCOL $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option alfresco.port $ALFRESCO_PORT $ALFRESCO_GLOBAL_PROPERTIES
+
+  #share host+proto+port
   cfg_replace_option share.host $SHARE_HOSTNAME $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option share.protocol $SHARE_PROTOCOL $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option share.port $SHARE_PORT $ALFRESCO_GLOBAL_PROPERTIES
+
+  #set server mode
+  cfg_replace_option system.serverMode $SYSTEM_SERVERMODE $ALFRESCO_GLOBAL_PROPERTIES
 
   #db.schema.update=true
   cfg_replace_option db.driver $DB_DRIVER $ALFRESCO_GLOBAL_PROPERTIES
@@ -173,6 +193,13 @@ source $ALF_HOME/scripts/setenv.sh
 # start internal postgres server only if the host is localhost
 if [ "${DB_KIND,,}" == "postgresql" ] && [ "$DB_HOST" == "localhost" ]; then
   $ALF_HOME/postgresql/scripts/ctl.sh start
+fi
+
+#disable CSRF if needed
+#rename the patch to prevent reuse
+if [ "$TOMCAT_CSRF_ENABLED" == "false" ] && [ -f "$TOMCAT_CSRF_PATCH" ] ;then
+  patch -Np0 < $TOMCAT_CSRF_PATCH
+  [ $? == 0 ] && mv "$TOMCAT_CSRF_PATCH" "${TOMCAT_CSRF_PATCH}.done"
 fi
 
 # start alfresco
