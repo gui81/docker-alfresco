@@ -54,7 +54,7 @@ docker run --name='alfresco' -it --rm -p 8080:8080 gui81/alfresco
 **NOTE**: Please allow a few minutes for the application to start, especially if
 populating the database for the first time.
 
-Go to `http://localhost:8080` or point to the ip of your docker server.  On the
+Go to `http://localhost:8080/share/page/` or point to the ip of your docker server.  On the
 Mac, if you are running docker-machine, then you can go to the ip reported by:
 
 ```bash
