@@ -71,7 +71,8 @@ mount the appropriate volume, connect to a remote PostgreSQL database, and use
 an external LDAP server for authentication:
 ```bash
 docker run --name='alfresco' -it --rm -p 445:445 -p 7070:7070 -p 8080:8080 \
-    -v '/host/alfresco_data:/content' \
+    -v '/host/alfresco/content:/content' \
+    -v '/host/alfresco/data:/alfresco/alf_data' \
     -e 'CONTENT_STORE=/content' \
     -e 'LDAP_ENABLED=true' \
     -e 'LDAP_AUTH_USERNAMEFORMAT=uid=%s,cn=users,cn=accounts,dc=example,dc=com' \
@@ -94,18 +95,16 @@ If you want to use this image in production, then please read on.
 
 # Configuration
 ## Datastore
-To persist data, you will want to make sure to specify and mount the
-CONTENT_STORE, example:
+In production, you will want to make sure to specify and mount the
+CONTENT_STORE and /alfresco/alf_data directories to persist this data.  Example:
 * `/content`
+* `/alfresco/alf_data`
 
 Volumes can be mounted by passing the **'-v'** option to the docker run command.
 The following is an example:
 ```bash
-docker run --name alfresco -it --rm -v /host/alfresco_data:/content
+docker run --name alfresco -it --rm -v /host/alfresco/content:/content -v /host/alfresco/data:/alfresco/alf_data
 ```
-:warning:<br>
-The directory "/alfresco/alf_data" in this container already has data (keystore,...).<br>
-If you mount a volume at this location using "-v", alfresco may not work.
 
 ## Database
 If the `DB_HOST` environment variable is not set, or set to localhost, then the
@@ -127,10 +126,13 @@ using environment variables.
 - **ALFRESCO_HOSTNAME**: hostname of the Alfresco server; default = `localhost`
 - **ALFRESCO_PORT**: port for afresco to listen to; default = `8080` if protocol is http or `8443` if protocol is https
 - **ALFRESCO_PROTOCOL**: protocol used by alfresco to generate links; default = `http`
+- **AMP_DIR_ALFRESCO**: directory containing AMP files (modules) for alfresco.war (bind mount as volume)
+- **AMP_DIR_SHARE**: directory containing AMP files (modules) for share.war (bind mount as volume)
 - **CIFS_ENABLED**: whether or not to enable CIFS; default = `true`
 - **CIFS_SERVER_NAME**: hostname of the CIFS server; default = `localhost`
 - **CIFS_DOMAIN**: domain of the CIFS server; default = `WORKGROUP`
-- **CONTENT_STORE**: where content is stored; default = `/alfresco/alf_data`
+- **CONTENT_STORE**: where content is stored; default = `/content`
+- **DB_CONN_PARAMS**: database connection parameters; for MySQL, default = ?useSSL=false, otherwise empty
 - **DB_HOST**: host of the database server; default = `localhost`
 - **DB_KIND**: postgresql or mysql; default = `postgresql`
 - **DB_NAME**: name of the database to connect to; default = `alfresco`
@@ -138,6 +140,7 @@ using environment variables.
 - **DB_USERNAME**: username to use when connecting to the database; default = `alfresco`
 - **FTP_PORT**: port of the database server; default = `5432`
 - **LDAP_ENABLED**: whether or not to enable LDAP; default = `false`
+- **LDAP_KIND**: ldap (e.g. for OpenLDAP) or ldap-ad (Active Directory); default = ldap
 - **LDAP_AUTH_USERNAMEFORMAT**: default = `uid=%s,cn=users,cn=accounts,dc=example,dc=com`
 - **LDAP_URL**: URL of LDAP server; default = `ldap://ldap.example.com:389`
 - **LDAP_DEFAULT_ADMINS**: comma separated list of admin names in ldap; default = `admin`

@@ -1,6 +1,6 @@
 alfresco:
   environment:
-    CONTENT_STORE: /alfresco/alf_data
+    CONTENT_STORE: /content
     DB_HOST: postgresql
     DB_KIND: postgresql
     DB_NAME: alfresco
@@ -29,6 +29,7 @@ alfresco:
   volumes:
     - /alfresco/alf_data
     - /alfresco/tomcat/logs
+    - /content
 
 postgresql:
   environment:

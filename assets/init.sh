@@ -7,27 +7,19 @@ CATALINA_HOME=$ALF_HOME/tomcat
 
 ALFRESCO_HOSTNAME=${ALFRESCO_HOSTNAME:-127.0.0.1}
 ALFRESCO_PROTOCOL=${ALFRESCO_PROTOCOL:-http}
-ALFRESCO_PORT=${ALFRESCO_PORT:-null}
-#do not change alfresco_port if specified as environment variable
-if [ "$ALFRESCO_PORT" == 'null'] ;then
-  if [ "${ALFRESCO_PROTOCOL,,}" = "https" ]; then
-    ALFRESCO_PORT=${ALFRESCO_PORT:-8443}
-  else
-    ALFRESCO_PORT=${ALFRESCO_PORT:-8080}
-  fi
+if [ "${ALFRESCO_PROTOCOL,,}" = "https" ]; then
+  ALFRESCO_PORT=${ALFRESCO_PORT:-8443}
+else
+  ALFRESCO_PORT=${ALFRESCO_PORT:-8080}
 fi
 
 
 SHARE_HOSTNAME=${SHARE_HOSTNAME:-127.0.0.1}
 SHARE_PROTOCOL=${SHARE_PROTOCOL:-http}
-SHARE_PORT=${SHARE_PORT:-null}
-#do not change share_port if specified as environment variable
-if [ "$SHARE_PORT" == 'null'] ;then
-  if [ "${SHARE_PROTOCOL,,}" = "https" ]; then
-    SHARE_PORT=${SHARE_PORT:-8443}
-  else
-    SHARE_PORT=${SHARE_PORT:-8080}
-  fi
+if [ "${SHARE_PROTOCOL,,}" = "https" ]; then
+  SHARE_PORT=${SHARE_PORT:-8443}
+else
+  SHARE_PORT=${SHARE_PORT:-8080}
 fi
 
 DB_KIND=${DB_KIND:-postgresql}
@@ -72,6 +64,7 @@ CIFS_DOMAIN=${CIFS_DOMAIN:-WORKGROUP}
 NFS_ENABLED=${NFS_ENABLED:-true}
 
 LDAP_ENABLED=${LDAP_ENABLED:-false}
+LDAP_KIND=${LDAP_KIND:-ldap}
 LDAP_AUTH_USERNAMEFORMAT=${LDAP_AUTH_USERNAMEFORMAT:-uid=%s,cn=users,cn=accounts,dc=example,dc=com}
 LDAP_URL=${LDAP_URL:-ldap://ldap.example.com:389}
 LDAP_DEFAULT_ADMINS=${LDAP_DEFAULT_ADMINS:-admin}
@@ -80,7 +73,7 @@ LDAP_SECURITY_CREDENTIALS=${LDAP_SECURITY_CREDENTIALS:-password}
 LDAP_GROUP_SEARCHBASE=${LDAP_GROUP_SEARCHBASE:-cn=groups,cn=accounts,dc=example,dc=com}
 LDAP_USER_SEARCHBASE=${LDAP_USER_SEARCHBASE:-cn=users,cn=accounts,dc=example,dc=com}
 
-CONTENT_STORE=${CONTENT_STORE:-\$\{dir.root\}}
+CONTENT_STORE=${CONTENT_STORE:-/content}
 
 TOMCAT_CSRF_PATCH="${ALF_HOME}/disable_tomcat_CSRF.patch"
 TOMCAT_CSRF_ENABLED=${TOMCAT_CSRF_ENABLED:-true}
@@ -152,10 +145,10 @@ function tweak_alfresco {
 
   # authentication
   if [ "$LDAP_ENABLED" == "true" ]; then
-    cfg_replace_option authentication.chain "alfrescoNtlm1:alfrescoNtlm,ldap1:ldap" $ALFRESCO_GLOBAL_PROPERTIES
+    cfg_replace_option authentication.chain "alfrescoNtlm1:alfrescoNtlm,ldap1:${LDAP_KIND}" $ALFRESCO_GLOBAL_PROPERTIES
 
     # now make substitutions in the LDAP config file
-    LDAP_CONFIG_FILE=$CATALINA_HOME/shared/classes/alfresco/extension/subsystems/Authentication/ldap/ldap1/ldap-authentication.properties
+    LDAP_CONFIG_FILE=$CATALINA_HOME/shared/classes/alfresco/extension/subsystems/Authentication/${LDAP_KIND}/ldap1/${LDAP_KIND}-authentication.properties
 
     cfg_replace_option ldap.authentication.userNameFormat $LDAP_AUTH_USERNAMEFORMAT $LDAP_CONFIG_FILE
     cfg_replace_option ldap.authentication.java.naming.provider.url $LDAP_URL $LDAP_CONFIG_FILE
