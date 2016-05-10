@@ -54,8 +54,9 @@ docker run --name='alfresco' -it --rm -p 8080:8080 gui81/alfresco
 **NOTE**: Please allow a few minutes for the application to start, especially if
 populating the database for the first time.
 
-Go to `http://localhost:8080` or point to the ip of your docker server.  On the
-Mac, if you are running docker-machine, then you can go to the ip reported by:
+Go to `http://localhost:8080/share` or point to the ip of your docker server.
+On the Mac, if you are running docker-machine, then you can go to the ip
+reported by:
 
 ```bash
 docker-machine ip [name of Docker VM]
@@ -103,7 +104,7 @@ The following is an example:
 docker run --name alfresco -it --rm -v /host/alfresco_data:/content
 ```
 :warning:<br>
-The directory "/alfresco/alf_data" in this container already have data (keystore,...).<br>
+The directory "/alfresco/alf_data" in this container already has data (keystore,...).<br>
 If you mount a volume at this location using "-v", alfresco may not work.
 
 ## Database
@@ -125,7 +126,7 @@ Below is the complete list of currently available parameters that can be set
 using environment variables.
 - **ALFRESCO_HOSTNAME**: hostname of the Alfresco server; default = `localhost`
 - **ALFRESCO_PORT**: port for afresco to listen to; default = `8080` if protocol is http or `8443` if protocol is https
-- **ALFRESCO_PROTOCOL**: protocol use by alfresco to generate links; default = `http`
+- **ALFRESCO_PROTOCOL**: protocol used by alfresco to generate links; default = `http`
 - **CIFS_ENABLED**: whether or not to enable CIFS; default = `true`
 - **CIFS_SERVER_NAME**: hostname of the CIFS server; default = `localhost`
 - **CIFS_DOMAIN**: domain of the CIFS server; default = `WORKGROUP`
@@ -159,7 +160,7 @@ using environment variables.
 - **SHARE_PORT**: port for share to listen to; default = `8080` if protocol is http or `8443` if protocol is https
 - **SHARE_PROTOCOL**: protocol use by share to generate links; default = `http`
 - **SYSTEM_SERVERMODE**: the server running mode for you system; default = `PRODUCTION`
-- **TOMCAT_CSRF_ENABLED**: Disable the tomcat CSRF policy, values: `true` or `false`; default = `false`
+- **TOMCAT_CSRF_ENABLED**: Disable the tomcat CSRF policy; default = `false`
 
 
 # Upgrading
