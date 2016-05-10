@@ -1,8 +1,8 @@
 #!/usr/bin/env sh
 set -e
 
-JAVA_RPM=jdk-8u73-linux-x64.rpm
-JAVA_URL=http://download.oracle.com/otn-pub/java/jdk/8u73-b02/$JAVA_RPM
+JAVA_RPM=jdk-8u91-linux-x64.rpm
+JAVA_URL=http://download.oracle.com/otn-pub/java/jdk/8u91-b14/$JAVA_RPM
 
 # get java
 wget --no-cookies --no-check-certificate \

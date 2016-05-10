@@ -35,6 +35,6 @@ postgresql:
     POSTGRES_DB: alfresco
     POSTGRES_PASSWORD: alfresco
     POSTGRES_USER: alfresco
-  image: postgres:9.3.10
+  image: postgres:9.4
   volumes:
     - /var/lib/postgresql/data
