@@ -7,20 +7,28 @@ CATALINA_HOME=$ALF_HOME/tomcat
 
 ALFRESCO_HOSTNAME=${ALFRESCO_HOSTNAME:-127.0.0.1}
 ALFRESCO_PROTOCOL=${ALFRESCO_PROTOCOL:-http}
-if [ "${ALFRESCO_PROTOCOL,,}" = "https" ]; then
-  ALFRESCO_PORT=${ALFRESCO_PORT:-8443}
-else
-  ALFRESCO_PORT=${ALFRESCO_PORT:-8080}
+ALFRESCO_PORT=${ALFRESCO_PORT:-null}
+#do not change alfresco_port if specified as environment variable
+if [ "$ALFRESCO_PORT" == 'null' ] ;then
+  if [ "${ALFRESCO_PROTOCOL,,}" == 'https' ]; then
+    ALFRESCO_PORT='8443'
+  else
+    ALFRESCO_PORT='8080'
+  fi
 fi
-
 
 SHARE_HOSTNAME=${SHARE_HOSTNAME:-127.0.0.1}
 SHARE_PROTOCOL=${SHARE_PROTOCOL:-http}
-if [ "${SHARE_PROTOCOL,,}" = "https" ]; then
-  SHARE_PORT=${SHARE_PORT:-8443}
-else
-  SHARE_PORT=${SHARE_PORT:-8080}
+SHARE_PORT=${SHARE_PORT:-null}
+#do not change share_port if specified as environment variable
+if [ "$SHARE_PORT" == 'null' ] ;then
+  if [ "${SHARE_PROTOCOL,,}" == 'https' ]; then
+    SHARE_PORT='8443'
+  else
+    SHARE_PORT='8080'
+  fi
 fi
+
 
 DB_KIND=${DB_KIND:-postgresql}
 DB_USERNAME=${DB_USERNAME:-alfresco}
