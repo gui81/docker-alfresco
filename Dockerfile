@@ -50,6 +50,12 @@ COPY assets/supervisord.conf /etc/supervisord.conf
 RUN mkdir -p /alfresco/tomcat/webapps/ROOT
 COPY assets/index.jsp /alfresco/tomcat/webapps/ROOT/
 
+# expand alfresco war so we can patch web.xml
+RUN mkdir -p /alfresco/tomcat/webapps/alfresco
+RUN cd /alfresco/tomcat/webapps/alfresco;jar xvf ../alfresco.war
+RUN rm /alfresco/tomcat/webapps/alfresco.war
+COPY assets/web.xml /alfresco/tomcat/webapps/alfresco/WEB-INF/web.xml
+
 VOLUME /alfresco/alf_data
 VOLUME /alfresco/tomcat/logs
 
