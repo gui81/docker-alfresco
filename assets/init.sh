@@ -195,5 +195,10 @@ if [ "$TOMCAT_CSRF_ENABLED" == "false" ] && [ -f "$TOMCAT_CSRF_PATCH" ] ;then
   [ $? == 0 ] && mv "$TOMCAT_CSRF_PATCH" "${TOMCAT_CSRF_PATCH}.done"
 fi
 
-# start alfresco
-$ALF_HOME/tomcat/scripts/ctl.sh start
+#added for debugg mode
+if [ "$DEBUG_MODE" == "true" ]; then
+  echo "Starting Tomcat with debug options"
+  $ALF_HOME/tomcat/bin/catalina.sh jpda start
+else
+  $ALF_HOME/tomcat/scripts/ctl.sh start
+fi
