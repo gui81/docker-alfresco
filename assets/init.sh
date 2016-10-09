@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 ALF_HOME=/alfresco
 ALF_BIN=$ALF_HOME/bin
@@ -8,20 +8,10 @@ CATALINA_HOME=$ALF_HOME/tomcat
 ALFRESCO_HOSTNAME=${ALFRESCO_HOSTNAME:-127.0.0.1}
 ALFRESCO_PROTOCOL=${ALFRESCO_PROTOCOL:-http}
 ALFRESCO_PORT=${ALFRESCO_PORT:-8080}
-if [ "${ALFRESCO_PROTOCOL,,}" = "https" ]; then
-  ALFRESCO_PORT=${ALFRESCO_PORT:-8443}
-else
-  ALFRESCO_PORT=${ALFRESCO_PORT:-8080}
-fi
 
 SHARE_HOSTNAME=${SHARE_HOSTNAME:-127.0.0.1}
 SHARE_PROTOCOL=${SHARE_PROTOCOL:-http}
 SHARE_PORT=${SHARE_PORT:-8080}
-if [ "${SHARE_PROTOCOL,,}" = "https" ]; then
-  SHARE_PORT=${SHARE_PORT:-8443}
-else
-  SHARE_PORT=${SHARE_PORT:-8080}
-fi
 
 DB_KIND=${DB_KIND:-postgresql}
 DB_USERNAME=${DB_USERNAME:-alfresco}
@@ -45,16 +35,27 @@ esac
 
 SYSTEM_SERVERMODE=${SYSTEM_SERVERMODE:-PRODUCTION}
 
-MAIL_HOST=${MAIL_HOST:-localhost}
-MAIL_PORT=${MAIL_PORT:-25}
-MAIL_USERNAME=${MAIL_USERNAME:-}
-MAIL_PASSWORD=${MAIL_PASSWORD:-}
+MAIL_SMTP_HOST=${MAIL_SMTP_HOST:-localhost}
+MAIL_SMTP_PORT=${MAIL_SMTP_PORT:-25}
+MAIL_SMTP_USERNAME=${MAIL_SMTP_USERNAME:-}
+MAIL_SMTP_PASSWORD=${MAIL_SMTP_PASSWORD:-}
 MAIL_FROM_DEFAULT=${MAIL_FROM_DEFAULT:-alfresco@alfresco.org}
 MAIL_PROTOCOL=${MAIL_PROTOCOL:-smtp}
 MAIL_SMTP_AUTH=${MAIL_SMTP_AUTH:-false}
-MAIL_SMTP_STARTTLS_ENABLE=${MAIL_SMTP_STARTTLS_ENABLE:-false}
+MAIL_SMTP_STARTTLS=${MAIL_SMTP_STARTTLS:-false}
 MAIL_SMTPS_AUTH=${MAIL_SMTPS_AUTH:-false}
 MAIL_SMTPS_STARTTLS_ENABLE=${MAIL_SMTPS_STARTTLS_ENABLE:-false}
+MAIL_FROM_DEFAULT_ENABLED=${MAIL_FROM_DEFAULT_ENABLED:-false}
+MAIL_ENCODING=${MAIL_ENCODING:-UTF-8}
+MAIL_SMTP_TIMEOUT=${MAIL_SMTP_TIMEOUT:-30000}
+MAIL_SMTP_DEBUG=${MAIL_SMTP_DEBUG:-false}
+
+MAIL_TESTMESSAGE_SEND=${MAIL_TESTMESSAGE_SEND:-false}
+MAIL_TESTMESSAGE_TO=${MAIL_TESTMESSAGE_TO:-}
+MAIL_TESTMESSAGE_SUBJECT=${MAIL_TESTMESSAGE_SUBJECT:-"Alfresco - Service - SMTP client online"}
+MAIL_TESTMESSAGE_TEXT=${MAIL_TESTMESSAGE_TEXT:-"Alfresco SMTP client ready and working"}
+
+NOTIFICATION_EMAIL_SITEINVITE=${NOTIFICATION_EMAIL_SITEINVITE:-false}
 
 FTP_PORT=${FTP_PORT:-21}
 
@@ -62,9 +63,8 @@ CIFS_ENABLED=${CIFS_ENABLED:-true}
 CIFS_SERVER_NAME=${CIFS_SERVER_NAME:-localhost}
 CIFS_DOMAIN=${CIFS_DOMAIN:-WORKGROUP}
 
-NFS_ENABLED=${NFS_ENABLED:-true}
-
 LDAP_ENABLED=${LDAP_ENABLED:-false}
+LDAP_KIND=${LDAP_KIND:-ldap}
 LDAP_AUTH_USERNAMEFORMAT=${LDAP_AUTH_USERNAMEFORMAT:-uid=%s,cn=users,cn=accounts,dc=example,dc=com}
 LDAP_URL=${LDAP_URL:-ldap://ldap.example.com:389}
 LDAP_DEFAULT_ADMINS=${LDAP_DEFAULT_ADMINS:-admin}
@@ -74,6 +74,10 @@ LDAP_GROUP_SEARCHBASE=${LDAP_GROUP_SEARCHBASE:-cn=groups,cn=accounts,dc=example,
 LDAP_USER_SEARCHBASE=${LDAP_USER_SEARCHBASE:-cn=users,cn=accounts,dc=example,dc=com}
 
 CONTENT_STORE=${CONTENT_STORE:-\$\{dir.root\}}
+
+REVERSE_PROXY_URL=${REVERSE_PROXY_URL:-}
+
+
 
 function cfg_replace_option {
   grep "$1" "$3" > /dev/null
@@ -94,9 +98,14 @@ function cfg_replace_option {
 
 function tweak_alfresco {
   ALFRESCO_GLOBAL_PROPERTIES=$CATALINA_HOME/shared/classes/alfresco-global.properties
+  echo -e "\n### Settings added by init script" >> $ALFRESCO_GLOBAL_PROPERTIES
 
   cfg_replace_option alfresco.host $ALFRESCO_HOSTNAME $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option alfresco.protocol $ALFRESCO_PROTOCOL $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option alfresco.port $ALFRESCO_PORT $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option share.host $SHARE_HOSTNAME $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option share.protocol $SHARE_PROTOCOL $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option share.port $SHARE_PORT $ALFRESCO_GLOBAL_PROPERTIES
 
   #db.schema.update=true
   cfg_replace_option db.driver $DB_DRIVER $ALFRESCO_GLOBAL_PROPERTIES
@@ -104,17 +113,6 @@ function tweak_alfresco {
   cfg_replace_option db.password $DB_PASSWORD $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option db.name $DB_NAME $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option db.url jdbc:${DB_KIND,,}://${DB_HOST}:${DB_PORT}/${DB_NAME}${DB_CONN_PARAMS} $ALFRESCO_GLOBAL_PROPERTIES
-
-  cfg_replace_option mail.host $MAIL_HOST $ALFRESCO_GLOBAL_PROPERTIES
-  cfg_replace_option mail.port $MAIL_PORT $ALFRESCO_GLOBAL_PROPERTIES
-  cfg_replace_option mail.username $MAIL_USERNAME $ALFRESCO_GLOBAL_PROPERTIES
-  cfg_replace_option mail.password $MAIL_PASSWORD $ALFRESCO_GLOBAL_PROPERTIES
-  cfg_replace_option mail.from.default $MAIL_FROM_DEFAULT $ALFRESCO_GLOBAL_PROPERTIES
-  cfg_replace_option mail.protocol $MAIL_PROTOCOL $ALFRESCO_GLOBAL_PROPERTIES
-  cfg_replace_option mail.smtp.auth $MAIL_SMTP_AUTH $ALFRESCO_GLOBAL_PROPERTIES
-  cfg_replace_option mail.smtp.starttls.enable $MAIL_SMTP_STARTTLS_ENABLE $ALFRESCO_GLOBAL_PROPERTIES
-  cfg_replace_option mail.smtps.auth $MAIL_SMTPS_AUTH $ALFRESCO_GLOBAL_PROPERTIES
-  cfg_replace_option mail.smtps.starttls.enable $MAIL_SMTPS_STARTTLS_ENABLE $ALFRESCO_GLOBAL_PROPERTIES
 
   cfg_replace_option ftp.port $FTP_PORT $ALFRESCO_GLOBAL_PROPERTIES
 
@@ -128,14 +126,37 @@ function tweak_alfresco {
   cfg_replace_option cifs.broadcast "0.0.0.255" $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option cifs.ipv6.enabled "false" $ALFRESCO_GLOBAL_PROPERTIES
 
-  cfg_replace_option nfs.enabled $NFS_ENABLED $ALFRESCO_GLOBAL_PROPERTIES
+
+  # MAIL/SMTP Configuration
+  # https://wiki.alfresco.com/wiki/Outbound_E-mail_Configuration
+  cfg_replace_option mail.smtp.host $MAIL_SMTP_HOST $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.smtp.port $MAIL_SMTP_PORT $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.smtp.username $MAIL_SMTP_USERNAME $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.smtp.password $MAIL_SMTP_PASSWORD $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.from.default $MAIL_FROM_DEFAULT $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.from.enabled $MAIL_FROM_DEFAULT_ENABLED $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.encoding $MAIL_ENCODING $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.smtp.timeout $MAIL_SMTP_TIMEOUT $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.smtp.debug $MAIL_SMTP_DEBUG $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.protocol $MAIL_PROTOCOL $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.smtp.auth $MAIL_SMTP_AUTH $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.smtp.starttls $MAIL_SMTP_STARTTLS $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.smtps.auth $MAIL_SMTPS_AUTH $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.smtps.starttls.enable $MAIL_SMTPS_STARTTLS_ENABLE $ALFRESCO_GLOBAL_PROPERTIES
+
+  cfg_replace_option mail.testmessage.send $MAIL_TESTMESSAGE_SEND $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.testmessage.to $MAIL_TESTMESSAGE_TO $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.testmessage.subject "$MAIL_TESTMESSAGE_SUBJECT" $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.testmessage.text "$MAIL_TESTMESSAGE_TEXT" $ALFRESCO_GLOBAL_PROPERTIES
+
+  cfg_replace_option notification.email.siteinvite $NOTIFICATION_EMAIL_SITEINVITE $ALFRESCO_GLOBAL_PROPERTIES
 
   # authentication
   if [ "$LDAP_ENABLED" == "true" ]; then
-    cfg_replace_option authentication.chain "alfrescoNtlm1:alfrescoNtlm,ldap1:ldap" $ALFRESCO_GLOBAL_PROPERTIES
+    cfg_replace_option authentication.chain "alfrescoNtlm1:alfrescoNtlm,ldap1:${LDAP_KIND}" $ALFRESCO_GLOBAL_PROPERTIES
 
     # now make substitutions in the LDAP config file
-    LDAP_CONFIG_FILE=$CATALINA_HOME/shared/classes/alfresco/extension/subsystems/Authentication/ldap/ldap1/ldap-authentication.properties
+    LDAP_CONFIG_FILE=$CATALINA_HOME/shared/classes/alfresco/extension/subsystems/Authentication/${LDAP_KIND}/ldap1/${LDAP_KIND}-authentication.properties
 
     cfg_replace_option ldap.authentication.userNameFormat $LDAP_AUTH_USERNAMEFORMAT $LDAP_CONFIG_FILE
     cfg_replace_option ldap.authentication.java.naming.provider.url $LDAP_URL $LDAP_CONFIG_FILE
@@ -153,7 +174,36 @@ function tweak_alfresco {
   cfg_replace_option dir.contentstore.deleted "${CONTENT_STORE}/contentstore.deleted" $ALFRESCO_GLOBAL_PROPERTIES
 }
 
+function set_reverse_proxy {
+  if [ -z $REVERSE_PROXY_URL]; then
+    echo "INFO: Reverse proxy not configured"
+  else
+    echo "INFO: Configuring alfresco for independant reverse-proxy support"
+    # Alfresco Open CMIS URL rewrite
+    cfg_replace_option opencmis.context.override true $ALFRESCO_GLOBAL_PROPERTIES
+    cfg_replace_option opencmis.context.value "" $ALFRESCO_GLOBAL_PROPERTIES 
+    cfg_replace_option opencmis.servletpath.override true $ALFRESCO_GLOBAL_PROPERTIES
+    cfg_replace_option opencmis.servletpath.value "" $ALFRESCO_GLOBAL_PROPERTIES
+    cfg_replace_option opencmis.server.override true $ALFRESCO_GLOBAL_PROPERTIES
+    cfg_replace_option opencmis.server.value $REVERSE_PROXY_URL/alfresco/api $ALFRESCO_GLOBAL_PROPERTIES
+    # Alfresco Office Service URL rewrite
+    cfg_replace_option aos.baseUrlOverwrite $REVERSE_PROXY_URL/alfresco/aos $ALFRESCO_GLOBAL_PROPERTIES
+
+    # Alfresco URL rewrite (i.e share link, email link)
+    ALFRECO_HOSTNAME=`echo "$REVERSE_PROXY_URL" | awk '{split($0,a,"://"); print a[2]}'`
+    ALFRECO_PROTOCOL=`echo "$REVERSE_PROXY_URL" | awk '{split($0,a,"://"); print a[1]}'`
+    SHARE_HOSTNAME=`echo "$REVERSE_PROXY_URL" | awk '{split($0,a,"://"); print a[2]}'`
+    SHARE_PROTOCOL=`echo "$REVERSE_PROXY_URL" | awk '{split($0,a,"://"); print a[1]}'`
+    
+    cfg_replace_option alfresco.host $ALFRESCO_HOSTNAME $ALFRESCO_GLOBAL_PROPERTIES
+    cfg_replace_option alfresco.protocol $ALFRESCO_PROTOCOL $ALFRESCO_GLOBAL_PROPERTIES
+    cfg_replace_option share.host $SHARE_HOSTNAME $ALFRESCO_GLOBAL_PROPERTIES
+    cfg_replace_option share.protocol $SHARE_PROTOCOL $ALFRESCO_GLOBAL_PROPERTIES
+  fi
+}
+
 tweak_alfresco
+set_reverse_proxy
 
 if [ -d "$AMP_DIR_ALFRESCO" ]; then
   echo "Installing Alfresco AMPs from $AMP_DIR_ALFRESCO..."
@@ -175,5 +225,5 @@ if [ "${DB_KIND,,}" == "postgresql" ] && [ "$DB_HOST" == "localhost" ]; then
   $ALF_HOME/postgresql/scripts/ctl.sh start
 fi
 
-# start alfresco
+# start Tomcat
 $ALF_HOME/tomcat/scripts/ctl.sh start

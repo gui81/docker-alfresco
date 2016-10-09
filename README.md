@@ -1,138 +1,93 @@
-docker-alfresco
-===============
 
-# Table of Contents
+### Introduction
 
-- [Introduction](#introduction)
-- [Contributing](#contributing)
-- [Installation](#installation)
-- [Quick Start](#quick-start)
-- [Configuration](#configuration)
-  - [Datastore](#datastore)
-  - [Database](#database)
-  - [Options](#options)
-- [Upgrading](#upgrading)
-- [References](#references)
+Alfresco is a leading Enterprise Content Management system which provides document management, collaboration, web content services and records and knowledge management.
 
+This image aims to help you run the latest version of the Alfresco Community Edition in a Docker container.
 
-# Introduction
-Dockerfile to build an Alfresco container image.
+### Quick Start
 
-
-# Contributing
-Here is how you can help:
-- Send a Pull Request with your awesome new features and bug fixes
-- Report [Issues](https://github.com/gui81/docker-alfresco/issues)
-
-
-# Installation
-Pull the image from the docker index.
-```bash
-docker pull gui81/alfresco:latest
-```
-
-or pull a particular version:
-```bash
-docker pull gui81/alfresco:5.0.d-1
-```
-
-Alternatively, you can build the image yourself:
-```bash
-git clone https://github.com/gui81/docker-alfresco.git
-cd docker-alfresco
-docker build --tag="$USER/alfresco" .
-```
-
-
-# Quick Start
-Run the alfresco image with the name "alfresco".
+Run the alfresco image:
 
 ```bash
-docker run --name='alfresco' -it --rm -p 8080:8080 gui81/alfresco
+docker run --name='alfresco' -it --rm -p 8080:8080 fjudith/alfresco
 ```
 
 **NOTE**: Please allow a few minutes for the application to start, especially if
-populating the database for the first time.
-
-Go to `http://localhost:8080` or point to the ip of your docker server.  On the
-Mac, if you are running docker-machine, then you can go to the ip reported by:
+populating the database for the first time. If you want to make sure that everything went fine, watch the log:
 
 ```bash
-docker-machine ip [name of Docker VM]
+docker exec -it alfresco /bin/bash
+tail -f /alfresco/tomcat/logs/catalina.out
+```
+Go to `http://localhost:8080/share` or point to the IP of your docker host.  On
+Mac or Windows, replace `localhost` with the IP address of your Docker host which you can get using
+
+```bash
+docker-machine ip default
 ```
 
 The default username and password are:
 * username: **admin**
 * password: **admin**
 
-Alfresco should now be up and running.  The following is an example that would
-mount the appropriate volume, connect to a remote PostgreSQL database, and use
-an external LDAP server for authentication:
+### Configuration
+
+#### Datastore
+
+If you use this image in production, you'll probably want to store files and database separately in an external location. Use the CONTENT_STORE environment variable to set the content store to a bind-mounted volume or a network share.
+
+#### Database
+
+If `DB_KIND` is `postgresql` and the `DB_HOST` environment variable is not set (or `localhost`),
+then the internal PostgreSQL server will be started and used.
+
+By setting `DB_KIND` to `mysql`, you can use an external MySQL server, e.g. one running in a Docker container:
 ```bash
-docker run --name='alfresco' -it --rm -p 445:445 -p 7070:7070 -p 8080:8080 \
-    -v /host/alfresco_data:/alfresco/alf_data \
-    -e 'CONTENT_STORE=/alfresco/alf_data' \
-    -e 'LDAP_ENABLED=true' \
-    -e 'LDAP_AUTH_USERNAMEFORMAT=uid=%s,cn=users,cn=accounts,dc=example,dc=com' \
-    -e 'LDAP_URL=ldap://ipa.example.com:389' \
-    -e 'LDAP_DEFAULT_ADMINS=admin' \
-    -e 'LDAP_SECURITY_PRINCIPAL=uid=admin,cn=users,cn=accounts,dc=example,dc=com' \
-    -e 'LDAP_SECURITY_CREDENTIALS=password' \
-    -e 'LDAP_GROUP_SEARCHBASE=cn=groups,cn=accounts,dc=example,dc=com' \
-    -e 'LDAP_USER_SEARCHBASE=cn=users,cn=accounts,dc=example,dc=com' \
-    -e 'DB_KIND=postgresql' \
-    -e 'DB_HOST=db_server.example.com' \
-    -e 'DB_USERNAME=alfresco' \
-    -e 'DB_PASSWORD=alfresco' \
-    -e 'DB_NAME=alfresco' \
-    gui81/alfresco
+docker run --name 'mysql' -d -p 3306:3306 \
+    -e MYSQL_ROOT_PASSWORD=secret \
+    -e MYSQL_DATABASE=alfresco \
+    -e MYSQL_USER=alfresco \
+    -e MYSQL_PASSWORD=secret \
+    mysql \
+    --character-set-server=utf8 \
+    --collation-server=utf8_general_ci \
+    --max_connections=1024
 ```
 
-If you want to use this image in production, then please read on.
+Configure the Alfresco container to use this MySQL server as database and a bind-mounted volume as content store:
 
-
-# Configuration
-## Datastore
-To persist data, you will want to make sure to specify and mount the
-CONTENT_STORE, example:
-* `/alfresco/alf_data`
-
-Volumes can be mounted by passing the **'-v'** option to the docker run command.
-The following is an example:
 ```bash
-docker run --name alfresco -it --rm -v /host/alfresco_data:/alfresco/alf_data
+docker run --name='alfresco' -d -p 8080:8080 \
+    -v /mnt/alfresco_content_store:/mnt/content_store \
+    -e CONTENT_STORE=/mnt/content_store \
+    -e DB_KIND=mysql \
+    -e DB_HOST=mysql \
+    -e DB_PASSWORD=secret \
+    --link mysql:mysql \
+    fjudith/alfresco
 ```
 
+#### Options
 
-## Database
-If the `DB_HOST` environment variable is not set, or set to localhost, then the
-image will use the internal PostgreSQL server.
-
-PostgreSQL is the default, but MySQL/MariaDB is also supported.  If you are
-using an existing database installation, then make sure to create the database
-and a user:
-```sql
-CREATE ROLE alfresco WITH LOGIN PASSWORD 'alfresco';
-CREATE DATABASE alfresco;
-GRANT ALL PRIVILEGES ON DATABASE alfresco TO alfresco;
-```
-
-
-## Options
 Below is the complete list of currently available parameters that can be set
 using environment variables.
 - **ALFRESCO_HOSTNAME**: hostname of the Alfresco server; default = `localhost`
+- **SHARE_HOSTNAME**: hostname of the share server; default = `localhost`
+- **CONTENT_STORE**: location of content store; default = `${dir.root}` (/alfresco/alf_data)
+- **DB_KIND**: postgresql or mysql; default = `postgresql`
+- **DB_USERNAME**: username to use when connecting to the database; default = `alfresco`
+- **DB_PASSWORD**: password to use when connecting to the database; default = `admin`
+- **DB_NAME**: name of the database to connect to; default = `alfresco`
+- **DB_HOST**: host of the database server; default = `localhost`
+- **DB_CONN_PARAMS**: database connection parameters; for MySQL, default = `?useSSL=false`, otherwise empty
+- **FTP_PORT**: port of the FTP server; default = `5432`
 - **CIFS_ENABLED**: whether or not to enable CIFS; default = `true`
 - **CIFS_SERVER_NAME**: hostname of the CIFS server; default = `localhost`
 - **CIFS_DOMAIN**: domain of the CIFS server; default = `WORKGROUP`
-- **CONTENT_STORE**: where content is stored; default = `/alfresco/alf_data`
-- **DB_HOST**: host of the database server; default = `localhost`
-- **DB_KIND**: postgresql or mysql; default = `postgresql`
-- **DB_NAME**: name of the database to connect to; default = `alfresco`
-- **DB_PASSWORD**: password to use when connecting to the database; default = `admin`
-- **DB_USERNAME**: username to use when connecting to the database; default = `alfresco`
-- **FTP_PORT**: port of the database server; default = `5432`
+- **NFS_ENABLED**: whether or not to enable NFS; default = `false`
 - **LDAP_ENABLED**: whether or not to enable LDAP; default = `false`
+- **LDAP_KIND**: ldap (e.g. for OpenLDAP) or ldap-ad (Active Directory); default = `ldap`
 - **LDAP_AUTH_USERNAMEFORMAT**: default = `uid=%s,cn=users,cn=accounts,dc=example,dc=com`
 - **LDAP_URL**: URL of LDAP server; default = `ldap://ldap.example.com:389`
 - **LDAP_DEFAULT_ADMINS**: comma separated list of admin names in ldap; default = `admin`
@@ -140,26 +95,22 @@ using environment variables.
 - **LDAP_SECURITY_CREDENTIALS**: default = `password`
 - **LDAP_GROUP_SEARCHBASE**: default = `cn=groups,cn=accounts,dc=example,dc=com`
 - **LDAP_USER_SEARCHBASE**: default = `cn=users,cn=accounts,dc=example,dc=com`
-- **MAIL_HOST**: hostname or IP where email should be sent; default = `localhost`
-- **MAIL_PORT**: default = `25`
-- **MAIL_USERNAME**: username to connect to the smtp server
-- **MAIL_PASSWORD**: password to connect to the smtp server
-- **MAIL_FROM_DEFAULT**: what is in the from field; default = `alfresco@alfresco.org`
-- **MAIL_PROTOCOL**: smtp or smtps; default = `smtp`
-- **MAIL_SMTP_AUTH**: is authentication required or not; default = `false`
-- **MAIL_SMTP_STARTTLS_ENABLE**: use starttls or not; default = `false`
-- **MAIL_SMTPS_AUTH**: is authentication required or not; default = `false`
-- **MAIL_SMTPS_STARTTLS_ENABLE**: use starttls or not; default = `false`
-- **NFS_ENABLED**: whether or not to enable NFS; default = `true`
-- **SHARE_HOSTNAME**: hostname of the share server; default = `localhost`
+- **AMP_DIR_ALFRESCO**: directory containing AMP files (modules) for alfresco.war (bind mount as volume)
+- **AMP_DIR_SHARE**: directory containing AMP files (modules) for share.war (bind mount as volume)
 
+### Build from Source
 
-# Upgrading
-TODO: I might be able to add some options that aid in upgrading.  For now though,
-backup, backup, backup, and then follow this guide:
-* http://docs.alfresco.com/community/concepts/ch-upgrade.html
+The source code is available at https://github.com/fjudith/alfresco.
 
+Make sure your Docker host has more than 2 GB RAM available. Docker Hub uses 2 GB for automated builds which is not enough, the Alfresco installer will complain and fail. The Docker Toolbox VM also uses 2 GB by default, use VirtualBox to change it to at least 4GB.
 
-# References
+```bash
+git clone https://github.com/fjudith/alfresco.git
+cd docker-alfresco
+docker build --tag="$(echo $USERNAME | awk '{print tolower($0)}')/alfresco" .
+```
+
+### References
+
 * http://www.alfresco.com/community
 * http://docs.alfresco.com/community/concepts/welcome-infocenter_community.html
