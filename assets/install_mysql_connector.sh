@@ -2,7 +2,7 @@
 set -e
 
 ALF_HOME=/alfresco
-CONNECTOR=mysql-connector-java-5.1.38
+CONNECTOR=mysql-connector-java-5.1.40
 
 cd /tmp
 curl -OL http://dev.mysql.com/get/Downloads/Connector-J/${CONNECTOR}.tar.gz
