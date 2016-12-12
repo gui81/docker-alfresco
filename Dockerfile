@@ -1,5 +1,8 @@
 FROM centos:centos7
+
 MAINTAINER Florian JUDITH <florian.judith.b@gmail.com>
+
+ENV TERM=xterm
 
 # install some necessary/desired RPMs and get updates
 RUN yum update -y && \
@@ -73,5 +76,6 @@ VOLUME /alfresco/tomcat/logs
 
 EXPOSE 21 137 138 139 445 8009 8080
 
-ENTRYPOINT /docker-entrypoint.sh
-CMD /usr/bin/supervisord -c /etc/supervisord.conf -n
+# ENTRYPOINT ["/docker-entrypoint.sh"]
+
+CMD ["/usr/bin/supervisord","-c","/etc/supervisord.conf","-n"]
