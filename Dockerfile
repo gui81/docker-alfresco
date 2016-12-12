@@ -49,10 +49,17 @@ COPY assets/ldap-ad-authentication.properties /alfresco/tomcat/shared/classes/al
 # Markdown manual editor and viewer
 # https://github.com/loftuxab/manual-manager
 COPY assets/install_manualmanager.sh /tmp/
+RUN chmod +x /tmp/install_manualmanager.sh
 
 # Copy BeCPG Add-On.
 # http://www.becpg.fr/
 COPY assets/install_becpg.sh /tmp/
+RUN chmod +x /tmp/install_becpg.sh
+
+# Fix Libreoffice startup
+RUN sed -e 's/\\;/;/g' /alfresco/libreoffice/scripts/libreoffice_ctl.sh > /alfresco/libreoffice/scripts/ctl.sh && \
+    chmod +x /alfresco/libreoffice/scripts/ctl.sh && \
+    mv -f /alfresco/postgresql/scripts/ctl.sh /alfresco/postgresql/scripts/ctl.sh.disabled
 
 # install scripts
 COPY assets/init.sh /alfresco/init.sh
