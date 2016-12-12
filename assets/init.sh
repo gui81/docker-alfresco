@@ -35,8 +35,8 @@ esac
 
 SYSTEM_SERVERMODE=${SYSTEM_SERVERMODE:-PRODUCTION}
 
-MAIL_SMTP_HOST=${MAIL_SMTP_HOST:-localhost}
-MAIL_SMTP_PORT=${MAIL_SMTP_PORT:-25}
+MAIL_HOST=${MAIL_HOST:-localhost}
+MAIL_PORT=${MAIL_PORT:-25}
 MAIL_SMTP_USERNAME=${MAIL_SMTP_USERNAME:-}
 MAIL_SMTP_PASSWORD=${MAIL_SMTP_PASSWORD:-}
 MAIL_FROM_DEFAULT=${MAIL_FROM_DEFAULT:-alfresco@alfresco.org}
@@ -129,10 +129,10 @@ function tweak_alfresco {
 
   # MAIL/SMTP Configuration
   # https://wiki.alfresco.com/wiki/Outbound_E-mail_Configuration
-  cfg_replace_option mail.smtp.host $MAIL_SMTP_HOST $ALFRESCO_GLOBAL_PROPERTIES
-  cfg_replace_option mail.smtp.port $MAIL_SMTP_PORT $ALFRESCO_GLOBAL_PROPERTIES
-  cfg_replace_option mail.smtp.username $MAIL_SMTP_USERNAME $ALFRESCO_GLOBAL_PROPERTIES
-  cfg_replace_option mail.smtp.password $MAIL_SMTP_PASSWORD $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.host $MAIL_SMTP_HOST $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.port $MAIL_SMTP_PORT $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.username $MAIL_USERNAME $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.password $MAIL_PASSWORD $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option mail.from.default $MAIL_FROM_DEFAULT $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option mail.from.enabled $MAIL_FROM_DEFAULT_ENABLED $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option mail.encoding $MAIL_ENCODING $ALFRESCO_GLOBAL_PROPERTIES
@@ -140,7 +140,7 @@ function tweak_alfresco {
   cfg_replace_option mail.smtp.debug $MAIL_SMTP_DEBUG $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option mail.protocol $MAIL_PROTOCOL $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option mail.smtp.auth $MAIL_SMTP_AUTH $ALFRESCO_GLOBAL_PROPERTIES
-  cfg_replace_option mail.smtp.starttls $MAIL_SMTP_STARTTLS $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.smtp.starttls.enable $MAIL_SMTP_STARTTLS $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option mail.smtps.auth $MAIL_SMTPS_AUTH $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option mail.smtps.starttls.enable $MAIL_SMTPS_STARTTLS_ENABLE $ALFRESCO_GLOBAL_PROPERTIES
 
