@@ -165,8 +165,8 @@ function tweak_alfresco {
 
   # MAIL/SMTP Configuration
   # https://wiki.alfresco.com/wiki/Outbound_E-mail_Configuration
-  cfg_replace_option mail.host $MAIL_SMTP_HOST $ALFRESCO_GLOBAL_PROPERTIES
-  cfg_replace_option mail.port $MAIL_SMTP_PORT $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.host $MAIL_HOST $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.port $MAIL_PORT $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option mail.username $MAIL_USERNAME $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option mail.password $MAIL_PASSWORD $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option mail.from.default $MAIL_FROM_DEFAULT $ALFRESCO_GLOBAL_PROPERTIES
