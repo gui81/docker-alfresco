@@ -62,8 +62,8 @@ RUN sed -e 's/\\;/;/g' /alfresco/libreoffice/scripts/libreoffice_ctl.sh > /alfre
     mv -f /alfresco/postgresql/scripts/ctl.sh /alfresco/postgresql/scripts/ctl.sh.disabled
 
 # install scripts
-COPY assets/init.sh /alfresco/init.sh
-COPY assets/supervisord.conf /etc/supervisord.conf
+COPY docker-entrypoint.sh /alfresco/
+COPY supervisord.conf /etc/
 
 RUN mkdir -p /alfresco/tomcat/webapps/ROOT
 COPY assets/index.jsp /alfresco/tomcat/webapps/ROOT/
@@ -72,4 +72,6 @@ VOLUME /alfresco/alf_data
 VOLUME /alfresco/tomcat/logs
 
 EXPOSE 21 137 138 139 445 8009 8080
+
+ENTRYPOINT /docker-entrypoint.sh
 CMD /usr/bin/supervisord -c /etc/supervisord.conf -n
