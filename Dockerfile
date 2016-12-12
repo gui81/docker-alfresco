@@ -7,17 +7,21 @@ MAINTAINER Lucas Johnson <lucasejohnson@netscape.net>
 RUN yum update -y && \
     yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm && \
     yum install -y \
-                   cups-libs \
-                   dbus-glib \
-                   fontconfig \
-                   hostname \
-                   libICE \
-                   libSM \
-                   libXext \
-                   libXinerama \
-                   libXrender \
-                   supervisor \
-                   wget && \
+        cups-libs \
+        dbus-glib \
+        fontconfig \
+        hostname \
+        libICE \
+        libSM \
+        libXext \
+        libXinerama \
+        libXrender \
+        supervisor \
+        xmlstarlet \
+        nano \
+        ImageMagick \
+        ghostscript \
+        wget && \
     yum clean all
 
 # install java
