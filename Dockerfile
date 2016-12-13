@@ -66,6 +66,7 @@ RUN sed -e 's/\\;/;/g' /alfresco/libreoffice/scripts/libreoffice_ctl.sh > /alfre
 
 # install scripts
 COPY docker-entrypoint.sh /alfresco/
+RUN chmod +x /alfresco/docker-entrypoint.sh 
 COPY supervisord.conf /etc/
 
 RUN mkdir -p /alfresco/tomcat/webapps/ROOT
