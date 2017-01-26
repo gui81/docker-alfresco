@@ -256,6 +256,13 @@ fi
 # setup environment
 source $ALF_HOME/scripts/setenv.sh
 
+# Fix Libreoffice startup
+if [[ ! -f /alfresco/postgresql/scripts/ctl.sh.disabled ]]: then
+  sed -e 's/\\;/;/g' /alfresco/libreoffice/scripts/libreoffice_ctl.sh > /alfresco/libreoffice/scripts/ctl.sh && \
+  chmod +x /alfresco/libreoffice/scripts/ctl.sh && \
+  mv -f /alfresco/postgresql/scripts/ctl.sh /alfresco/postgresql/scripts/ctl.sh.disabled
+fi
+
 # start internal postgres server only if the host is localhost
 if [ "${DB_KIND,,}" == "postgresql" ] && [ "$DB_HOST" == "localhost" ]; then
   $ALF_HOME/postgresql/scripts/ctl.sh start

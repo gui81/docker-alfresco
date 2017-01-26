@@ -24,7 +24,8 @@ RUN yum update -y && \
         nano \
         ImageMagick \
         ghostscript \
-        wget && \
+        wget \
+        unzip && \
     yum clean all
 
 # install oracle java
@@ -59,10 +60,10 @@ RUN chmod +x /tmp/install_manualmanager.sh
 COPY assets/install_becpg.sh /tmp/
 RUN chmod +x /tmp/install_becpg.sh
 
-# Fix Libreoffice startup
-RUN sed -e 's/\\;/;/g' /alfresco/libreoffice/scripts/libreoffice_ctl.sh > /alfresco/libreoffice/scripts/ctl.sh && \
-    chmod +x /alfresco/libreoffice/scripts/ctl.sh && \
-    mv -f /alfresco/postgresql/scripts/ctl.sh /alfresco/postgresql/scripts/ctl.sh.disabled
+# Copy Markdown Preview Add-On.
+# https://github.com/cetra3/md-preview
+COPY assets/install_md-preview.sh /tmp/
+RUN chmod +x /tmp/install_md-preview.sh
 
 # install scripts
 COPY docker-entrypoint.sh /alfresco/
