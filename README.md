@@ -148,6 +148,7 @@ using environment variables.
 - **LDAP_SECURITY_CREDENTIALS**: default = `password`
 - **LDAP_GROUP_SEARCHBASE**: default = `cn=groups,cn=accounts,dc=example,dc=com`
 - **LDAP_USER_SEARCHBASE**: default = `cn=users,cn=accounts,dc=example,dc=com`
+- **LDAP_USER_ID_ATTRIBUTE_NAME**: default = `uid`
 - **MAIL_HOST**: hostname or IP where email should be sent; default = `localhost`
 - **MAIL_PORT**: default = `25`
 - **MAIL_USERNAME**: username to connect to the smtp server
