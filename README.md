@@ -149,6 +149,13 @@ using environment variables.
 - **LDAP_GROUP_SEARCHBASE**: default = `cn=groups,cn=accounts,dc=example,dc=com`
 - **LDAP_USER_SEARCHBASE**: default = `cn=users,cn=accounts,dc=example,dc=com`
 - **LDAP_USER_ID_ATTRIBUTE_NAME**: default = `uid`
+- **LDAP_GROUP_QUERY**: default = `(objectclass=posixGroup)`
+- **LDAP_GROUP_DIFFERENTIAL_QUERY**: default = `(&(objectclass=posixGroup)(!(modifyTimestamp<={0})))`
+- **LDAP_PERSON_QUERY**: default = `(objectclass=inetOrgPerson)`
+- **LDAP_PERSON_DIFFERENTIAL_QUERY**: default = `(&(objectclass=inetOrgPerson)(!(modifyTimestamp<={0})))`
+- **LDAP_GROUP_TYPE**: default = `posixGroup`
+- **LDAP_PERSON_TYPE**: default = `inetOrgPerson`
+- **LDAP_GROUP_MEMBER_ATTRIBUTE_NAME**: default = `memberUid`
 - **MAIL_HOST**: hostname or IP where email should be sent; default = `localhost`
 - **MAIL_PORT**: default = `25`
 - **MAIL_USERNAME**: username to connect to the smtp server
