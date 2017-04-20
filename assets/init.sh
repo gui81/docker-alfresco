@@ -159,6 +159,14 @@ function tweak_alfresco {
     cfg_replace_option ldap.synchronization.groupSearchBase $LDAP_GROUP_SEARCHBASE $LDAP_CONFIG_FILE
     cfg_replace_option ldap.synchronization.userSearchBase $LDAP_USER_SEARCHBASE $LDAP_CONFIG_FILE
     cfg_replace_option ldap.synchronization.userIdAttributeName $LDAP_USER_ID_ATTRIBUTE_NAME $LDAP_CONFIG_FILE
+    cfg_replace_option ldap.synchronization.groupQuery $LDAP_GROUP_QUERY $LDAP_CONFIG_FILE
+    cfg_replace_option ldap.synchronization.groupDifferentialQuery $LDAP_GROUP_DIFFERENTIAL_QUERY $LDAP_CONFIG_FILE
+    cfg_replace_option ldap.synchronization.personQuery $LDAP_PERSON_QUERY $LDAP_CONFIG_FILE
+    cfg_replace_option ldap.synchronization.personDifferentialQuery $LDAP_PERSON_DIFFERENTIAL_QUERY $LDAP_CONFIG_FILE
+    cfg_replace_option ldap.synchronization.groupType $LDAP_GROUP_TYPE $LDAP_CONFIG_FILE
+    cfg_replace_option ldap.synchronization.personType $LDAP_PERSON_TYPE $LDAP_CONFIG_FILE
+    cfg_replace_option ldap.synchronization.groupMemberAttributeName $LDAP_GROUP_MEMBER_ATTRIBUTE_NAME $LDAP_CONFIG_FILE
+                
   else
     cfg_replace_option authentication.chain "alfrescoNtlm1:alfrescoNtlm" $ALFRESCO_GLOBAL_PROPERTIES
   fi
