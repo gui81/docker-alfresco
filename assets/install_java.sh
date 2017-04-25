@@ -5,7 +5,7 @@ JAVA_RPM=jdk-8u91-linux-x64.rpm
 JAVA_URL=http://download.oracle.com/otn-pub/java/jdk/8u91-b14/$JAVA_RPM
 
 # get java
-wget --no-cookies --no-check-certificate \
+wget -nv --no-cookies --no-check-certificate \
      --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" \
      $JAVA_URL
 
