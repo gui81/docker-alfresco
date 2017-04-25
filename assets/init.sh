@@ -73,10 +73,10 @@ LDAP_SECURITY_CREDENTIALS=${LDAP_SECURITY_CREDENTIALS:-password}
 LDAP_GROUP_SEARCHBASE=${LDAP_GROUP_SEARCHBASE:-cn=groups,cn=accounts,dc=example,dc=com}
 LDAP_USER_SEARCHBASE=${LDAP_USER_SEARCHBASE:-cn=users,cn=accounts,dc=example,dc=com}
 LDAP_USER_ID_ATTRIBUTE_NAME=${LDAP_USER_ID_ATTRIBUTE_NAME:-uid}
-LDAP_GROUP_QUERY=${LDAP_GROUP_QUERY:-(objectclass=posixGroup)}
-LDAP_GROUP_DIFFERENTIAL_QUERY=${LDAP_GROUP_DIFFERENTIAL_QUERY:-(&(objectclass=posixGroup)(!(modifyTimestamp<={0})))}
-LDAP_PERSON_QUERY=${LDAP_PERSON_QUERY:-(objectclass=inetOrgPerson)}
-LDAP_PERSON_DIFFERENTIAL_QUERY=${LDAP_PERSON_DIFFERENTIAL_QUERY:-(&(objectclass=inetOrgPerson)(!(modifyTimestamp<={0})))}
+LDAP_GROUP_QUERY=${LDAP_GROUP_QUERY:-\(objectclass=posixGroup\)}
+LDAP_GROUP_DIFFERENTIAL_QUERY=${LDAP_GROUP_DIFFERENTIAL_QUERY:-\(&\(objectclass=posixGroup\)\(!\(modifyTimestamp<=\{0\}\)\)\)}
+LDAP_PERSON_QUERY=${LDAP_PERSON_QUERY:-\(objectclass=inetOrgPerson\)}
+LDAP_PERSON_DIFFERENTIAL_QUERY=${LDAP_PERSON_DIFFERENTIAL_QUERY:-\(&\(objectclass=inetOrgPerson\)\(!\(modifyTimestamp<=\{0\}\)\)\)}
 LDAP_GROUP_TYPE=${LDAP_GROUP_TYPE:-posixGroup}
 LDAP_PERSON_TYPE=${LDAP_PERSON_TYPE:-inetOrgPerson}
 LDAP_GROUP_MEMBER_ATTRIBUTE_NAME=${LDAP_GROUP_MEMBER_ATTRIBUTE_NAME:-memberUid}
