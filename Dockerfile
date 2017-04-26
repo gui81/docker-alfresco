@@ -39,6 +39,7 @@ RUN mkdir -p /alfresco/tomcat/shared/classes/alfresco/extension/subsystems/Authe
 RUN mkdir -p /alfresco/tomcat/shared/classes/alfresco/extension/subsystems/Authentication/ldap-ad/ldap1/
 COPY assets/ldap-authentication.properties /alfresco/tomcat/shared/classes/alfresco/extension/subsystems/Authentication/ldap/ldap1/ldap-authentication.properties
 COPY assets/ldap-ad-authentication.properties /alfresco/tomcat/shared/classes/alfresco/extension/subsystems/Authentication/ldap-ad/ldap1/ldap-ad-authentication.properties
+COPY assets/replace_vars.awk /tmp
 
 # adding path file used to disable tomcat CSRF
 COPY assets/disable_tomcat_CSRF.patch /alfresco/disable_tomcat_CSRF.patch

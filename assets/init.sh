@@ -63,23 +63,23 @@ CIFS_DOMAIN=${CIFS_DOMAIN:-WORKGROUP}
 
 NFS_ENABLED=${NFS_ENABLED:-true}
 
-LDAP_ENABLED=${LDAP_ENABLED:-false}
-LDAP_KIND=${LDAP_KIND:-ldap}
-LDAP_AUTH_USERNAMEFORMAT=${LDAP_AUTH_USERNAMEFORMAT:-uid=%s,cn=users,cn=accounts,dc=example,dc=com}
-LDAP_URL=${LDAP_URL:-ldap://ldap.example.com:389}
-LDAP_DEFAULT_ADMINS=${LDAP_DEFAULT_ADMINS:-admin}
-LDAP_SECURITY_PRINCIPAL=${LDAP_SECURITY_PRINCIPAL:-uid=admin,cn=users,cn=accounts,dc=example,dc=com}
-LDAP_SECURITY_CREDENTIALS=${LDAP_SECURITY_CREDENTIALS:-password}
-LDAP_GROUP_SEARCHBASE=${LDAP_GROUP_SEARCHBASE:-cn=groups,cn=accounts,dc=example,dc=com}
-LDAP_USER_SEARCHBASE=${LDAP_USER_SEARCHBASE:-cn=users,cn=accounts,dc=example,dc=com}
-LDAP_USER_ID_ATTRIBUTE_NAME=${LDAP_USER_ID_ATTRIBUTE_NAME:-uid}
-LDAP_GROUP_QUERY=${LDAP_GROUP_QUERY:-\(objectclass=posixGroup\)}
-LDAP_GROUP_DIFFERENTIAL_QUERY=${LDAP_GROUP_DIFFERENTIAL_QUERY:-\(&\(objectclass=posixGroup\)\(!\(modifyTimestamp<=\{0\}\)\)\)}
-LDAP_PERSON_QUERY=${LDAP_PERSON_QUERY:-\(objectclass=inetOrgPerson\)}
-LDAP_PERSON_DIFFERENTIAL_QUERY=${LDAP_PERSON_DIFFERENTIAL_QUERY:-\(&\(objectclass=inetOrgPerson\)\(!\(modifyTimestamp<=\{0\}\)\)\)}
-LDAP_GROUP_TYPE=${LDAP_GROUP_TYPE:-posixGroup}
-LDAP_PERSON_TYPE=${LDAP_PERSON_TYPE:-inetOrgPerson}
-LDAP_GROUP_MEMBER_ATTRIBUTE_NAME=${LDAP_GROUP_MEMBER_ATTRIBUTE_NAME:-memberUid}
+export LDAP_ENABLED=${LDAP_ENABLED:-false}
+export LDAP_KIND=${LDAP_KIND:-ldap}
+export LDAP_AUTH_USERNAMEFORMAT=${LDAP_AUTH_USERNAMEFORMAT:-uid=%s,cn=users,cn=accounts,dc=example,dc=com}
+export LDAP_URL=${LDAP_URL:-ldap://ldap.example.com:389}
+export LDAP_DEFAULT_ADMINS=${LDAP_DEFAULT_ADMINS:-admin}
+export LDAP_SECURITY_PRINCIPAL=${LDAP_SECURITY_PRINCIPAL:-uid=admin,cn=users,cn=accounts,dc=example,dc=com}
+export LDAP_SECURITY_CREDENTIALS=${LDAP_SECURITY_CREDENTIALS:-password}
+export LDAP_GROUP_SEARCHBASE=${LDAP_GROUP_SEARCHBASE:-cn=groups,cn=accounts,dc=example,dc=com}
+export LDAP_USER_SEARCHBASE=${LDAP_USER_SEARCHBASE:-cn=users,cn=accounts,dc=example,dc=com}
+export LDAP_USER_ID_ATTRIBUTE_NAME=${LDAP_USER_ID_ATTRIBUTE_NAME:-uid}
+export LDAP_GROUP_QUERY=${LDAP_GROUP_QUERY:-\(objectclass=posixGroup\)}
+export LDAP_GROUP_DIFFERENTIAL_QUERY=${LDAP_GROUP_DIFFERENTIAL_QUERY:-\(&\(objectclass=posixGroup\)\(!\(modifyTimestamp<=\{0\}\)\)\)}
+export LDAP_PERSON_QUERY=${LDAP_PERSON_QUERY:-\(objectclass=inetOrgPerson\)}
+export LDAP_PERSON_DIFFERENTIAL_QUERY=${LDAP_PERSON_DIFFERENTIAL_QUERY:-\(&\(objectclass=inetOrgPerson\)\(!\(modifyTimestamp<=\{0\}\)\)\)}
+export LDAP_GROUP_TYPE=${LDAP_GROUP_TYPE:-posixGroup}
+export LDAP_PERSON_TYPE=${LDAP_PERSON_TYPE:-inetOrgPerson}
+export LDAP_GROUP_MEMBER_ATTRIBUTE_NAME=${LDAP_GROUP_MEMBER_ATTRIBUTE_NAME:-memberUid}
 
 CONTENT_STORE=${CONTENT_STORE:-/content}
 
@@ -158,21 +158,8 @@ function tweak_alfresco {
     # now make substitutions in the LDAP config file
     LDAP_CONFIG_FILE=$CATALINA_HOME/shared/classes/alfresco/extension/subsystems/Authentication/${LDAP_KIND}/ldap1/${LDAP_KIND}-authentication.properties
 
-    cfg_replace_option ldap.authentication.userNameFormat $LDAP_AUTH_USERNAMEFORMAT $LDAP_CONFIG_FILE
-    cfg_replace_option ldap.authentication.java.naming.provider.url $LDAP_URL $LDAP_CONFIG_FILE
-    cfg_replace_option ldap.authentication.defaultAdministratorUserNames $LDAP_DEFAULT_ADMINS $LDAP_CONFIG_FILE
-    cfg_replace_option ldap.synchronization.java.naming.security.principal $LDAP_SECURITY_PRINCIPAL $LDAP_CONFIG_FILE
-    cfg_replace_option ldap.synchronization.java.naming.security.credentials $LDAP_SECURITY_CREDENTIALS $LDAP_CONFIG_FILE
-    cfg_replace_option ldap.synchronization.groupSearchBase $LDAP_GROUP_SEARCHBASE $LDAP_CONFIG_FILE
-    cfg_replace_option ldap.synchronization.userSearchBase $LDAP_USER_SEARCHBASE $LDAP_CONFIG_FILE
-    cfg_replace_option ldap.synchronization.userIdAttributeName $LDAP_USER_ID_ATTRIBUTE_NAME $LDAP_CONFIG_FILE
-    cfg_replace_option ldap.synchronization.groupQuery $LDAP_GROUP_QUERY $LDAP_CONFIG_FILE
-    cfg_replace_option ldap.synchronization.groupDifferentialQuery $LDAP_GROUP_DIFFERENTIAL_QUERY $LDAP_CONFIG_FILE
-    cfg_replace_option ldap.synchronization.personQuery $LDAP_PERSON_QUERY $LDAP_CONFIG_FILE
-    cfg_replace_option ldap.synchronization.personDifferentialQuery $LDAP_PERSON_DIFFERENTIAL_QUERY $LDAP_CONFIG_FILE
-    cfg_replace_option ldap.synchronization.groupType $LDAP_GROUP_TYPE $LDAP_CONFIG_FILE
-    cfg_replace_option ldap.synchronization.personType $LDAP_PERSON_TYPE $LDAP_CONFIG_FILE
-    cfg_replace_option ldap.synchronization.groupMemberAttributeName $LDAP_GROUP_MEMBER_ATTRIBUTE_NAME $LDAP_CONFIG_FILE
+    gawk -f /tmp/replace_vars.awk $LDAP_CONFIG_FILE > /tmp/properties.new
+    mv -f /tmp/properties.new $LDAP_CONFIG_FILE
                 
   else
     cfg_replace_option authentication.chain "alfrescoNtlm1:alfrescoNtlm" $ALFRESCO_GLOBAL_PROPERTIES
