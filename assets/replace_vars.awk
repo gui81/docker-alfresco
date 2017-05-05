@@ -1,7 +1,7 @@
 BEGIN {
     FS="="
 }
-/=@@.*@@/ {
+/=\s*@@.*@@/ {
     match($2, "@+([^@]+)@+", result)
     varname = result[1]
     value = ENVIRON[varname]

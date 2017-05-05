@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 
+set +e
+
 ALF_HOME=/alfresco
 ALF_BIN=$ALF_HOME/bin
 ALF_SETUP=$ALF_HOME/setup
 CATALINA_HOME=$ALF_HOME/tomcat
+AMP_DIR_ALFRESCO=$ALF_HOME/amps
+AMP_DIR_SHARE=$ALF_HOME/amps_share
 
 ALFRESCO_HOSTNAME=${ALFRESCO_HOSTNAME:-127.0.0.1}
 ALFRESCO_PROTOCOL=${ALFRESCO_PROTOCOL:-http}
@@ -80,6 +84,20 @@ export LDAP_PERSON_DIFFERENTIAL_QUERY=${LDAP_PERSON_DIFFERENTIAL_QUERY:-\(&\(obj
 export LDAP_GROUP_TYPE=${LDAP_GROUP_TYPE:-posixGroup}
 export LDAP_PERSON_TYPE=${LDAP_PERSON_TYPE:-inetOrgPerson}
 export LDAP_GROUP_MEMBER_ATTRIBUTE_NAME=${LDAP_GROUP_MEMBER_ATTRIBUTE_NAME:-memberUid}
+
+export CROWD_ENABLED=${CROWD_ENABLED:-false}
+export CROWD_URL=${CROWD_URL:-http://localhost:8095/crowd}
+export CROWD_SYNCHRONIZATION_ENABLE=${CROWD_SYNCHRONIZATION_ENABLE:-true}
+export CROWD_AUTH_SSO_ENABLED=${CROWD_AUTH_SSO_ENABLED:-false}
+export CROWD_AUTH_LICENSE=${CROWD_AUTH_LICENSE:-LICENSE_NOT_SET_AS_ENVIRONMENT_IN_DOCKER}
+export CROWD_AUTHENTICATION_ALLOW_GUEST_LOGIN=${CROWD_AUTHENTICATION_ALLOW_GUEST_LOGIN:-false}
+export CROWD_GROUP_UPPERCASE=${CROWD_GROUP_UPPERCASE:-true}
+export CROWD_GROUP_PREFIX_STRIP=${CROWD_GROUP_PREFIX_STRIP:-}
+export CROWD_GROUP_PREFIX_ADD=${CROWD_GROUP_PREFIX_ADD:-}
+export CROWD_GROUP_REPLACE_DASHES=${CROWD_GROUP_REPLACE_DASHES:-true}
+
+export ALFRESCO_CROWD_APPLICATION_NAME=${ALFRESCO_CROWD_APPLICATION_NAME:-alfresco}
+export ALFRESCO_CROWD_APPLICATION_PASSWORD=${ALFRESCO_CROWD_APPLICATION_PASSWORD}
 
 CONTENT_STORE=${CONTENT_STORE:-/content}
 
@@ -161,8 +179,36 @@ function tweak_alfresco {
     gawk -f /tmp/replace_vars.awk $LDAP_CONFIG_FILE > /tmp/properties.new
     mv -f /tmp/properties.new $LDAP_CONFIG_FILE
                 
+  elif [ "$CROWD_ENABLED" == "true" ]; then
+    cfg_replace_option authentication.chain "alfrescoNtlm1:alfrescoNtlm,crowd-auth:crowd-auth" $ALFRESCO_GLOBAL_PROPERTIES
+
+    echo "Configuring Crowd..."
+    # Now make substitutions in the CROWD config file crowd-auth-authentication.properties
+    CROWD_CONFIG_FILE=/templates/crowd-auth/crowd-auth-authentication.properties
+
+    gawk -f /tmp/replace_vars.awk $CROWD_CONFIG_FILE > /tmp/properties.new
+    mv -f /tmp/properties.new $CROWD_CONFIG_FILE
+
+    # Update patched file in WAR archive
+    RELATIVE_WAR_PATH=WEB-INF/classes/alfresco/subsystems/Authentication/crowd-auth
+    mkdir -p $RELATIVE_WAR_PATH
+    cp -f $CROWD_CONFIG_FILE $RELATIVE_WAR_PATH
+    echo "Patching WAR file..."
+    /usr/bin/jar uf $CATALINA_HOME/webapps/alfresco.war $RELATIVE_WAR_PATH/crowd-auth-authentication.properties
+    rm -rf $RELATIVE_WAR_PATH
+
+    # now make substitutions in the CROWD config file crowd.properties
+    CROWD_CONFIG_FILE=$CATALINA_HOME/shared/classes/crowd.properties
+
+    gawk -f /tmp/replace_vars.awk $CROWD_CONFIG_FILE > /tmp/properties.new
+    mv -f /tmp/properties.new $CROWD_CONFIG_FILE
+
+    wget -nv -O /alfresco/amps/crowd-auth-${CROWD_PLUGIN_VERSION}.amp ${CROWD_PLUGIN_DOWNLOAD_URL}
+
   else
+
     cfg_replace_option authentication.chain "alfrescoNtlm1:alfrescoNtlm" $ALFRESCO_GLOBAL_PROPERTIES
+
   fi
 
   # content store
@@ -170,19 +216,23 @@ function tweak_alfresco {
   cfg_replace_option dir.contentstore.deleted "${CONTENT_STORE}/contentstore.deleted" $ALFRESCO_GLOBAL_PROPERTIES
 }
 
-tweak_alfresco
-
 if [ -d "$AMP_DIR_ALFRESCO" ]; then
   echo "Installing Alfresco AMPs from $AMP_DIR_ALFRESCO..."
   $ALF_HOME/java/bin/java -jar $ALF_HOME/bin/alfresco-mmt.jar install $AMP_DIR_ALFRESCO $CATALINA_HOME/webapps/alfresco.war -directory -force -verbose
   $ALF_HOME/java/bin/java -jar $ALF_HOME/bin/alfresco-mmt.jar list $CATALINA_HOME/webapps/alfresco.war
+  rm -rf $CATALINA_HOME/webapps/alfresco
+  . $ALF_HOME/bin/clean_tomcat.sh
 fi
 
 if [ -d "$AMP_DIR_SHARE" ]; then
   echo "Installing Share AMPs from $AMP_DIR_SHARE..."
   $ALF_HOME/java/bin/java -jar $ALF_HOME/bin/alfresco-mmt.jar install $AMP_DIR_SHARE $CATALINA_HOME/webapps/share.war -directory -force -verbose
   $ALF_HOME/java/bin/java -jar $ALF_HOME/bin/alfresco-mmt.jar list $CATALINA_HOME/webapps/share.war
+  rm -rf $CATALINA_HOME/webapps/share
+  . $ALF_HOME/bin/clean_tomcat.sh
 fi
+
+tweak_alfresco
 
 # setup environment
 source $ALF_HOME/scripts/setenv.sh

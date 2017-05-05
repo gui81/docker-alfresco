@@ -11,6 +11,7 @@ wget -nv --no-cookies --no-check-certificate \
 
 # install java
 yum localinstall -y ./$JAVA_RPM
+rm -f ./$JAVA_RPM
 
 # make sure the oracle jdk is the default
 update-alternatives --install /usr/bin/java java /usr/java/latest/bin/java 1065
