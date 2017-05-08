@@ -156,6 +156,18 @@ using environment variables.
 - **LDAP_GROUP_TYPE**: default = `posixGroup`
 - **LDAP_PERSON_TYPE**: default = `inetOrgPerson`
 - **LDAP_GROUP_MEMBER_ATTRIBUTE_NAME**: default = `memberUid`
+- **CROWD_ENABLED**: default: = `false`
+- **CROWD_AUTH_LICENSE**: There is no default value for the license string. It must **always** be set as an environment variable. The licence file provided by the issuer must be converted to a single string by replacing newlines by spaces. This can be done by sourcing the little helper script `crowd/crowd_source_license.sh` with the filename of the license file as first parameter. 
+- **CROWD_URL**: URL for calls to the Crowd API; default: = `http://localhost:8095/crowd`
+- **CROWD_SYNCHRONIZATION_ENABLE**: activate synchronization of a few select attributes from Crowd; default: = `true`
+- **CROWD_AUTH_SSO_ENABLED**: active SSL in calls the Crowd API; default: = `false`
+- **CROWD_AUTHENTICATION_ALLOW_GUEST_LOGIN**: default: = `false`
+- **CROWD_GROUP_UPPERCASE**: convert alle Crowd group names into uppercase; default: = `true`
+- **CROWD_GROUP_PREFIX_STRIP**: provide a prefix that will be stripped from Crowd group names if present; default: not set
+- **CROWD_GROUP_PREFIX_ADD**: provide a suffix that will be added to Crowd group names if present; default: not set
+- **CROWD_GROUP_REPLACE_DASHES**: replace all dashes in Crowd group names by underscores; default: = `true`
+- **ALFRESCO_CROWD_APPLICATION_NAME**: the name of the registered Alfresco application in Crowd; default: = `alfresco`
+- **ALFRESCO_CROWD_APPLICATION_PASSWORD**: the password of the registered Alfresco applcation in Crowd; default: not set
 - **MAIL_HOST**: hostname or IP where email should be sent; default = `localhost`
 - **MAIL_PORT**: default = `25`
 - **MAIL_USERNAME**: username to connect to the smtp server
