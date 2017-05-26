@@ -1,11 +1,13 @@
 alfresco:
   environment:
+    SAMPLE_SITE_DISABLED: "false"
     CONTENT_STORE: /content
     DB_HOST: postgresql
     DB_KIND: postgresql
     DB_NAME: alfresco
     DB_PASSWORD: alfresco
     DB_USERNAME: alfresco
+    LDAP_ENABLED: "false"
     #LDAP_AUTH_USERNAMEFORMAT: uid=%s,cn=users,cn=accounts,dc=example,dc=com
     #LDAP_DEFAULT_ADMINS: admin
     #LDAP_ENABLED: true
@@ -14,6 +16,21 @@ alfresco:
     #LDAP_SECURITY_PRINCIPAL: uid=admin,cn=users,cn=accounts,dc=example,dc=com
     #LDAP_URL: ldap://ipa.example.com:389
     #LDAP_USER_SEARCHBASE: cn=users,cn=accounts,dc=example,dc=com
+    CROWD_ENABLED: "false"
+    #CROWD_SYNCHRONIZATION_ENABLE: "true"
+    #CROWD_AUTH_SSO_ENABLED: "false"
+    #CROWD_AUTH_LICENSE: "MY_LICENSE"
+    #CROWD_URL: http://crowd:8095/crowd
+    #CROWD_AUTHENTICATION_ALLOW_GUEST_LOGIN: "false"
+    #CROWD_GROUP_UPPERCASE: "true"
+    #CROWD_GROUP_PREFIX_STRIP: ""
+    #CROWD_GROUP_PREFIX_ADD: ""
+    #CROWD_GROUP_REPLACE_DASHES: "true"
+    #ALFRESCO_CROWD_APPLICATION_NAME: "alfresco"
+    #ALFRESCO_CROWD_APPLICATION_PASSWORD: "my-password"
+    SYNCHRONIZATION_SYNCHRONIZE_CHANGES_ONLY: "true"
+    SYNCHRONIZATION_IMPORT_CRON: "0 0/5 * * * ?"
+
   build: .
   links:
     - postgresql:postgresql
