@@ -55,6 +55,7 @@ COPY assets/disable_tomcat_CSRF.patch /alfresco/disable_tomcat_CSRF.patch
 
 # install scripts
 COPY assets/init.sh /alfresco/init.sh
+COPY assets/supervisord.conf /etc/supervisord.conf
 
 RUN mkdir -p /alfresco/tomcat/webapps/ROOT
 COPY assets/index.jsp /alfresco/tomcat/webapps/ROOT/

@@ -184,7 +184,9 @@ using environment variables.
 - **SHARE_PROTOCOL**: protocol use by share to generate links; default = `http`
 - **SYSTEM_SERVERMODE**: the server running mode for you system; default = `PRODUCTION`
 - **TOMCAT_CSRF_ENABLED**: Disable the tomcat CSRF policy; default = `false`
-
+- **SYNCHRONIZATION_IMPORT_CRON**: CRON-type pattern to run the LDAP/Crowd synchronization; default = `0 0/5 * * * ?` which corresponds to a 5-minute schedule
+- **SYNCHRONIZATION_SYNCHRONIZE_CHANGES_ONLY**: When true, only synchronizes LDAP/Crowd changes since last run, otherwise a full sync is performed; default = `true`
+- **SAMPLE_SITE_DISABLED**: deactives the sample site which comes with Alfresco; default = `false`
 
 # Upgrading
 TODO: I might be able to add some options that aid in upgrading.  For now though,

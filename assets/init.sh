@@ -67,6 +67,11 @@ CIFS_DOMAIN=${CIFS_DOMAIN:-WORKGROUP}
 
 NFS_ENABLED=${NFS_ENABLED:-true}
 
+SAMPLE_SITE_DISABLED=${SAMPLE_SITE_DISABLED:-false}
+
+SYNCHRONIZATION_IMPORT_CRON=${SYNCHRONIZATION_IMPORT_CRON:-0\ 0\/5\ \*\ \*\ \*\ ?}
+SYNCHRONIZATION_SYNCHRONIZE_CHANGES_ONLY=${SYNCHRONIZATION_SYNCHRONIZE_CHANGES_ONLY:-true}
+
 export LDAP_ENABLED=${LDAP_ENABLED:-false}
 export LDAP_KIND=${LDAP_KIND:-ldap}
 export LDAP_AUTH_USERNAMEFORMAT=${LDAP_AUTH_USERNAMEFORMAT:-uid=%s,cn=users,cn=accounts,dc=example,dc=com}
@@ -168,6 +173,11 @@ function tweak_alfresco {
   cfg_replace_option cifs.ipv6.enabled "false" $ALFRESCO_GLOBAL_PROPERTIES
 
   cfg_replace_option nfs.enabled $NFS_ENABLED $ALFRESCO_GLOBAL_PROPERTIES
+
+  cfg_replace_option sample.site.disabled $SAMPLE_SITE_DISABLED $ALFRESCO_GLOBAL_PROPERTIES
+
+  cfg_replace_option synchronization.import.cron "$SYNCHRONIZATION_IMPORT_CRON" $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option synchronization.synchronizeChangesOnly $SYNCHRONIZATION_SYNCHRONIZE_CHANGES_ONLY $ALFRESCO_GLOBAL_PROPERTIES
 
   # authentication
   if [ "$LDAP_ENABLED" == "true" ]; then
