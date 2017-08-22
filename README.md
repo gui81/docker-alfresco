@@ -1,7 +1,6 @@
-docker-alfresco
-===============
+# docker-alfresco
 
-# Table of Contents
+## Table of Contents
 
 - [Introduction](#introduction)
 - [Contributing](#contributing)
@@ -14,18 +13,15 @@ docker-alfresco
 - [Upgrading](#upgrading)
 - [References](#references)
 
-
-# Introduction
+## Introduction
 Dockerfile to build an Alfresco container image.
 
-
-# Contributing
+## Contributing
 Here is how you can help:
 - Send a Pull Request with your awesome new features and bug fixes
 - Report [Issues](https://github.com/gui81/docker-alfresco/issues)
 
-
-# Installation
+## Installation
 Pull the image from the docker index.
 ```bash
 docker pull gui81/alfresco:latest
@@ -33,7 +29,7 @@ docker pull gui81/alfresco:latest
 
 or pull a particular version:
 ```bash
-docker pull gui81/alfresco:5.0.d-1
+docker pull gui81/alfresco:201707
 ```
 
 Alternatively, you can build the image yourself:
@@ -43,8 +39,7 @@ cd docker-alfresco
 docker build --tag="$USER/alfresco" .
 ```
 
-
-# Quick Start
+## Quick Start
 Run the alfresco image with the name "alfresco".
 
 ```bash
@@ -63,8 +58,8 @@ docker-machine ip [name of Docker VM]
 ```
 
 The default username and password are:
-* username: **admin**
-* password: **admin**
+- username: **admin**
+- password: **admin**
 
 Alfresco should now be up and running.  The following is an example that would
 mount the appropriate volume, connect to a remote PostgreSQL database, and use
@@ -92,13 +87,12 @@ docker run --name='alfresco' -it --rm -p 445:445 -p 7070:7070 -p 8080:8080 \
 
 If you want to use this image in production, then please read on.
 
-
-# Configuration
-## Datastore
+## Configuration
+### Datastore
 In production, you will want to make sure to specify and mount the
 CONTENT_STORE and /alfresco/alf_data directories to persist this data.  Example:
-* `/content`
-* `/alfresco/alf_data`
+- `/content`
+- `/alfresco/alf_data`
 
 Volumes can be mounted by passing the **'-v'** option to the docker run command.
 The following is an example:
@@ -106,7 +100,7 @@ The following is an example:
 docker run --name alfresco -it --rm -v /host/alfresco/content:/content -v /host/alfresco/data:/alfresco/alf_data
 ```
 
-## Database
+### Database
 If the `DB_HOST` environment variable is not set, or set to localhost, then the
 image will use the internal PostgreSQL server.
 
@@ -119,8 +113,7 @@ CREATE DATABASE alfresco;
 GRANT ALL PRIVILEGES ON DATABASE alfresco TO alfresco;
 ```
 
-
-## Options
+### Options
 Below is the complete list of currently available parameters that can be set
 using environment variables.
 - **ALFRESCO_HOSTNAME**: hostname of the Alfresco server; default = `localhost`
@@ -165,13 +158,11 @@ using environment variables.
 - **SYSTEM_SERVERMODE**: the server running mode for you system; default = `PRODUCTION`
 - **TOMCAT_CSRF_ENABLED**: Disable the tomcat CSRF policy; default = `false`
 
+## Upgrading
+TODO: I might be able to add some options that aid in upgrading.  For now
+though, backup, backup, backup, and then follow this guide:
+- <http://docs.alfresco.com/community/concepts/ch-upgrade.html>
 
-# Upgrading
-TODO: I might be able to add some options that aid in upgrading.  For now though,
-backup, backup, backup, and then follow this guide:
-* http://docs.alfresco.com/community/concepts/ch-upgrade.html
-
-
-# References
-* http://www.alfresco.com/community
-* http://docs.alfresco.com/community/concepts/welcome-infocenter_community.html
+## References
+- <http://www.alfresco.com/community>
+- <http://docs.alfresco.com/community/concepts/welcome-infocenter_community.html>

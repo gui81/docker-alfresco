@@ -1,5 +1,20 @@
 #!/usr/bin/env bash
 
+# first check to see if alf_data has keystore directory, this is a crude way
+# to determine if the mounted location has data or not, then we can bootstrap
+# if it is the first time this is run
+# let's copy data into the volume if it does not exist
+if [ ! -d /alfresco/alf_data/keystore ]; then
+  rsync -av --no-o --no-g /alf_data.install/alf_data /alfresco/
+
+  echo
+  echo 'Alfresco copied data from an original installation; ready for start up.'
+  echo 'WARNING: if this was not expected, then you likely mounted a volume'
+  echo '         that did not have the necessary files.  Please check your'
+  echo '         volume paths.'
+  echo
+fi
+
 ALF_HOME=/alfresco
 ALF_BIN=$ALF_HOME/bin
 ALF_SETUP=$ALF_HOME/setup
@@ -182,6 +197,7 @@ fi
 
 # setup environment
 source $ALF_HOME/scripts/setenv.sh
+export FONTCONFIG_PATH=/etc/fonts
 
 # start internal postgres server only if the host is localhost
 if [ "${DB_KIND,,}" == "postgresql" ] && [ "$DB_HOST" == "localhost" ]; then
