@@ -134,13 +134,14 @@ using environment variables.
 - **FTP_PORT**: port of the database server; default = `5432`
 - **LDAP_ENABLED**: whether or not to enable LDAP; default = `false`
 - **LDAP_KIND**: ldap (e.g. for OpenLDAP) or ldap-ad (Active Directory); default = ldap
-- **LDAP_AUTH_USERNAMEFORMAT**: default = `uid=%s,cn=users,cn=accounts,dc=example,dc=com`
+- **LDAP_AUTH_USERNAMEFORMAT**: Specifies how to map the user identifier entered by the user to that passed through to LDAP. Could be empty to enable "search and bind" method. default = `uid=%s,cn=users,cn=accounts,dc=example,dc=com`
 - **LDAP_URL**: URL of LDAP server; default = `ldap://ldap.example.com:389`
 - **LDAP_DEFAULT_ADMINS**: comma separated list of admin names in ldap; default = `admin`
 - **LDAP_SECURITY_PRINCIPAL**: default = `uid=admin,cn=users,cn=accounts,dc=example,dc=com`
 - **LDAP_SECURITY_CREDENTIALS**: default = `password`
 - **LDAP_GROUP_SEARCHBASE**: default = `cn=groups,cn=accounts,dc=example,dc=com`
 - **LDAP_USER_SEARCHBASE**: default = `cn=users,cn=accounts,dc=example,dc=com`
+- **LDAP_USER_ATTRIBUTENAME**: The attribute name on people objects found in LDAP to use as the uid in Alfresco (commonly `uid` in OpenLDAP or `sAMAccountName` in Active Directory); default = `uid`
 - **MAIL_HOST**: hostname or IP where email should be sent; default = `localhost`
 - **MAIL_PORT**: default = `25`
 - **MAIL_USERNAME**: username to connect to the smtp server
