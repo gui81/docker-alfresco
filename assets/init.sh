@@ -213,5 +213,8 @@ if [ "$TOMCAT_CSRF_ENABLED" == "false" ] && [ -f "$TOMCAT_CSRF_PATCH" ] ;then
   [ $? == 0 ] && mv "$TOMCAT_CSRF_PATCH" "${TOMCAT_CSRF_PATCH}.done"
 fi
 
+# Edit share-config-custom.xml
+python /alfresco/edit_custom_config.py 
+
 # start alfresco
 $ALF_HOME/tomcat/scripts/ctl.sh start
