@@ -158,6 +158,7 @@ using environment variables.
 - **SHARE_PROTOCOL**: protocol use by share to generate links; default = `http`
 - **SYSTEM_SERVERMODE**: the server running mode for you system; default = `PRODUCTION`
 - **TOMCAT_CSRF_ENABLED**: Disable the tomcat CSRF policy; default = `false`
+- **WEBDAV_REPOSITORY_URL**: Webdav base URL in UI; default = `http://localhost:8080/`
 
 ## Upgrading
 TODO: I might be able to add some options that aid in upgrading.  For now
