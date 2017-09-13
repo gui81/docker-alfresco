@@ -142,6 +142,7 @@ using environment variables.
 - **LDAP_GROUP_SEARCHBASE**: default = `cn=groups,cn=accounts,dc=example,dc=com`
 - **LDAP_USER_SEARCHBASE**: default = `cn=users,cn=accounts,dc=example,dc=com`
 - **LDAP_USER_ATTRIBUTENAME**: The attribute name on people objects found in LDAP to use as the uid in Alfresco (commonly `uid` in OpenLDAP or `sAMAccountName` in Active Directory); default = `uid`
+- **LDAP_GROUP_MEMBER_ATTRIBUTENAME**: The attribute in LDAP on group objects that defines the DN for its members (commonly `memberUid` in OpenLDAP or `member` in Active Directory); default = `memberUid`
 - **MAIL_HOST**: hostname or IP where email should be sent; default = `localhost`
 - **MAIL_PORT**: default = `25`
 - **MAIL_USERNAME**: username to connect to the smtp server
