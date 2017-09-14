@@ -55,5 +55,8 @@ VOLUME /alfresco/alf_data
 VOLUME /alfresco/tomcat/logs
 VOLUME /content
 
-EXPOSE 21 137 138 139 445 7070 8009 8080
+ENV JPDA_ADDRESS=5005
+ENV JPDA_TRANSPORT=dt_socket
+
+EXPOSE 21 137 138 139 445 7070 8009 8080 5005
 CMD /usr/bin/supervisord -c /etc/supervisord.conf -n
