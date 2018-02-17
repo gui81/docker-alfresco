@@ -131,7 +131,10 @@ using environment variables.
 - **DB_NAME**: name of the database to connect to; default = `alfresco`
 - **DB_PASSWORD**: password to use when connecting to the database; default = `admin`
 - **DB_USERNAME**: username to use when connecting to the database; default = `alfresco`
-- **FTP_PORT**: port of the database server; default = `5432`
+- **FTP_ENABLED**: whether or not to enable FTP; default = `true`
+- **FTP_PORT**: port of the ftp server; default = `21`
+- **IMAP_ENABLED**: whether or not to enable IMAP; default = `true`
+- **IMAP_HOST**: host to bind imap-port to; default = `0.0.0.0`
 - **LDAP_ENABLED**: whether or not to enable LDAP; default = `false`
 - **LDAP_KIND**: ldap (e.g. for OpenLDAP) or ldap-ad (Active Directory); default = ldap
 - **LDAP_AUTH_USERNAMEFORMAT**: Specifies how to map the user identifier entered by the user to that passed through to LDAP. Could be empty to enable "search and bind" method. default = `uid=%s,cn=users,cn=accounts,dc=example,dc=com`
