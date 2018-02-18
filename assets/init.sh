@@ -70,7 +70,11 @@ MAIL_SMTP_STARTTLS_ENABLE=${MAIL_SMTP_STARTTLS_ENABLE:-false}
 MAIL_SMTPS_AUTH=${MAIL_SMTPS_AUTH:-false}
 MAIL_SMTPS_STARTTLS_ENABLE=${MAIL_SMTPS_STARTTLS_ENABLE:-false}
 
+FTP_ENABLED=${FTP_ENABLED:-true}
 FTP_PORT=${FTP_PORT:-21}
+
+IMAP_ENABLED=${IMAP_ENABLED:-true}
+IMAP_HOST=${IMAP_HOST:-0.0.0.0}
 
 CIFS_ENABLED=${CIFS_ENABLED:-true}
 CIFS_SERVER_NAME=${CIFS_SERVER_NAME:-localhost}
@@ -146,7 +150,11 @@ function tweak_alfresco {
   cfg_replace_option mail.smtps.auth $MAIL_SMTPS_AUTH $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option mail.smtps.starttls.enable $MAIL_SMTPS_STARTTLS_ENABLE $ALFRESCO_GLOBAL_PROPERTIES
 
+  cfg_replace_option ftp.enabled $FTP_ENABLED $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option ftp.port $FTP_PORT $ALFRESCO_GLOBAL_PROPERTIES
+
+  cfg_replace_option imap.server.enabled $IMAP_ENABLED $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option imap.server.host $IMAP_HOST $ALFRESCO_GLOBAL_PROPERTIES
 
   # @see https://forums.alfresco.com/en/viewtopic.php?f=8&t=20893
   # CIFS works, but you have to login as a native Alfresco account, like admin
