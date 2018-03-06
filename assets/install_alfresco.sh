@@ -10,7 +10,7 @@ ALF_URL=http://dl.alfresco.com/release/community/201707-build-00028/$ALF_BIN
 # get alfresco installer
 mkdir -p $ALF_HOME
 cd /tmp
-curl -O $ALF_URL
+curl -L -O $ALF_URL
 chmod +x $ALF_BIN
 
 # install alfresco
