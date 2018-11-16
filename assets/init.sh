@@ -78,6 +78,11 @@ CIFS_DOMAIN=${CIFS_DOMAIN:-WORKGROUP}
 
 NFS_ENABLED=${NFS_ENABLED:-true}
 
+$EXTERNAL_AUTH_ENABLED=${EXTERNAL_AUTH_ENABLED:-false}
+$EXTERNAL_AUTH_PROXY_USER_NAME=${EXTERNAL_AUTH_ENABLED:-}
+$EXTERNAL_AUTH_DEFAULT_ADMINS=${EXTERNAL_AUTH_ENABLED:-admin}
+$EXTERNAL_AUTH_PROXY_HEADER=${EXTERNAL_AUTH_ENABLED:-X-Alfresco-Remote-User}
+
 LDAP_ENABLED=${LDAP_ENABLED:-false}
 LDAP_KIND=${LDAP_KIND:-ldap}
 LDAP_AUTH_USERNAMEFORMAT=${LDAP_AUTH_USERNAMEFORMAT-uid=%s,cn=users,cn=accounts,dc=example,dc=com}
@@ -160,10 +165,34 @@ function tweak_alfresco {
 
   cfg_replace_option nfs.enabled $NFS_ENABLED $ALFRESCO_GLOBAL_PROPERTIES
 
-  # authentication
-  if [ "$LDAP_ENABLED" == "true" ]; then
-    cfg_replace_option authentication.chain "alfrescoNtlm1:alfrescoNtlm,ldap1:${LDAP_KIND}" $ALFRESCO_GLOBAL_PROPERTIES
 
+
+  # authentication matrix
+  if [ "$LDAP_ENABLED" == "true"  ] && [ "$EXTERNAL_AUTH_ENABLED" == "false" ]; then
+    cfg_replace_option authentication.chain "alfrescoNtlm1:alfrescoNtlm,ldap1:${LDAP_KIND}" $ALFRESCO_GLOBAL_PROPERTIES
+  fi
+  
+  if [ "$LDAP_ENABLED" == "false"  ] && [ "$EXTERNAL_AUTH_ENABLED" == "true" ]; then
+    cfg_replace_option authentication.chain "alfrescoNtlm1:alfrescoNtlm,external1:external" $ALFRESCO_GLOBAL_PROPERTIES
+  fi
+
+  if [ "$LDAP_ENABLED" == "true"  ] && [ "$EXTERNAL_AUTH_ENABLED" == "true" ]; then
+    cfg_replace_option authentication.chain "alfrescoNtlm1:alfrescoNtlm,external1:external,ldap1:${LDAP_KIND}" $ALFRESCO_GLOBAL_PROPERTIES
+  fi
+  
+  if [ "$LDAP_ENABLED" == "false"  ] && [ "$EXTERNAL_AUTH_ENABLED" == "false" ]; then
+    cfg_replace_option authentication.chain "alfrescoNtlm1:alfrescoNtlm" $ALFRESCO_GLOBAL_PROPERTIES
+  fi
+  
+  if [ "$EXTERNAL_AUTH_ENABLED" == "true" ]; then
+    cfg_replace_option external.authentication.proxyUserName $EXTERNAL_AUTH_PROXY_USER_NAME "$LDAP_CONFIG_FILE"
+    cfg_replace_option external.authentication.enabled $EXTERNAL_AUTH_ENABLED $LDAP_CONFIG_FILE
+    cfg_replace_option external.authentication.defaultAdministratorUserNames $EXTERNAL_AUTH_DEFAULT_ADMINS $LDAP_CONFIG_FILE
+    cfg_replace_option external.authentication.proxyHeader $EXTERNAL_AUTH_PROXY_HEADER $LDAP_CONFIG_FILE
+  fi
+  
+
+  if [ "$LDAP_ENABLED" == "true" ]; then
     # now make substitutions in the LDAP config file
     LDAP_CONFIG_FILE=$CATALINA_HOME/shared/classes/alfresco/extension/subsystems/Authentication/${LDAP_KIND}/ldap1/${LDAP_KIND}-authentication.properties
 
@@ -176,8 +205,6 @@ function tweak_alfresco {
     cfg_replace_option ldap.synchronization.userSearchBase $LDAP_USER_SEARCHBASE $LDAP_CONFIG_FILE
     cfg_replace_option ldap.synchronization.userIdAttributeName $LDAP_USER_ATTRIBUTENAME $LDAP_CONFIG_FILE
     cfg_replace_option ldap.synchronization.groupMemberAttributeName $LDAP_GROUP_MEMBER_ATTRIBUTENAME $LDAP_CONFIG_FILE
-  else
-    cfg_replace_option authentication.chain "alfrescoNtlm1:alfrescoNtlm" $ALFRESCO_GLOBAL_PROPERTIES
   fi
 
   # content store
