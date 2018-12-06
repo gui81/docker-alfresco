@@ -78,11 +78,22 @@ CIFS_DOMAIN=${CIFS_DOMAIN:-WORKGROUP}
 
 NFS_ENABLED=${NFS_ENABLED:-true}
 
+SOLR_ENABLE=${SOLR_ENABLE:-false}
+SOLR_MODULE=${SOLR_MODULE:-solr4}
+SOLR_HOST=${SOLR_HOST:-locahost}
+SOLR_PORT=${SOLR_PORT:-8080}
+SOLR_PORT_SSL=${SOLR_PORT_SSL:-8443}
+SOLR_SECURE_COMMS=${SOLR_SECURE_COMMS:-https}
+
+AUDIT_ENABLED=${AUDIT_ENABLED:-false}
+AUDIT_ALFRESCO_ACCESS_ENABLED=${AUDIT_ALFRESCO_ACCESS_ENABLED:-false}
+
 EXTERNAL_AUTH_ENABLED=${EXTERNAL_AUTH_ENABLED:-false}
-EXTERNAL_AUTH_PROXY_USER_NAME=${EXTERNAL_AUTH_PROXY_USER_NAME:-alfresco-system}
+EXTERNAL_AUTH_PROXY_USER_NAME=${EXTERNAL_AUTH_PROXY_USER_NAME:-}
 EXTERNAL_AUTH_DEFAULT_ADMINS=${EXTERNAL_AUTH_DEFAULT_ADMINS:-admin}
 EXTERNAL_AUTH_PROXY_HEADER=${EXTERNAL_AUTH_PROXY_HEADER:-X-Alfresco-Remote-User}
 EXTERNAL_AUTH_USER_ID_PATTERN=${EXTERNAL_AUTH_USER_ID_PATTERN:-}
+
 
 LDAP_ENABLED=${LDAP_ENABLED:-false}
 LDAP_KIND=${LDAP_KIND:-ldap}
@@ -120,6 +131,9 @@ function cfg_replace_option {
 
 function tweak_alfresco {
   ALFRESCO_GLOBAL_PROPERTIES=$CATALINA_HOME/shared/classes/alfresco-global.properties
+
+  cfg_replace_option audit.enabled $AUDIT_ENABLED $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option audit.alfresco-access.enabled $AUDIT_ALFRESCO_ACCESS_ENABLED $ALFRESCO_GLOBAL_PROPERTIES
 
   #alfresco host+proto+port
   cfg_replace_option alfresco.host $ALFRESCO_HOSTNAME $ALFRESCO_GLOBAL_PROPERTIES
@@ -174,11 +188,11 @@ function tweak_alfresco {
   fi
   
   if [ "$LDAP_ENABLED" == "false"  ] && [ "$EXTERNAL_AUTH_ENABLED" == "true" ]; then
-    cfg_replace_option authentication.chain "alfrescoNtlm1:alfrescoNtlm,external1:external" $ALFRESCO_GLOBAL_PROPERTIES
+    cfg_replace_option authentication.chain "external1:external,alfrescoNtlm1:alfrescoNtlm" $ALFRESCO_GLOBAL_PROPERTIES
   fi
 
   if [ "$LDAP_ENABLED" == "true"  ] && [ "$EXTERNAL_AUTH_ENABLED" == "true" ]; then
-    cfg_replace_option authentication.chain "alfrescoNtlm1:alfrescoNtlm,external1:external,ldap1:${LDAP_KIND}" $ALFRESCO_GLOBAL_PROPERTIES
+    cfg_replace_option authentication.chain "external1:external,alfrescoNtlm1:alfrescoNtlm,ldap1:${LDAP_KIND}" $ALFRESCO_GLOBAL_PROPERTIES
   fi
   
   if [ "$LDAP_ENABLED" == "false"  ] && [ "$EXTERNAL_AUTH_ENABLED" == "false" ]; then
@@ -187,10 +201,10 @@ function tweak_alfresco {
   
   if [ "$EXTERNAL_AUTH_ENABLED" == "true" ]; then
     cfg_replace_option external.authentication.enabled $EXTERNAL_AUTH_ENABLED $ALFRESCO_GLOBAL_PROPERTIES
-    cfg_replace_option external.authentication.proxyUserName $EXTERNAL_AUTH_PROXY_USER_NAME $ALFRESCO_GLOBAL_PROPERTIES
+    cfg_replace_option external.authentication.proxyUserName "$EXTERNAL_AUTH_PROXY_USER_NAME" $ALFRESCO_GLOBAL_PROPERTIES
     cfg_replace_option external.authentication.defaultAdministratorUserNames $EXTERNAL_AUTH_DEFAULT_ADMINS $ALFRESCO_GLOBAL_PROPERTIES
     cfg_replace_option external.authentication.proxyHeader $EXTERNAL_AUTH_PROXY_HEADER $ALFRESCO_GLOBAL_PROPERTIES
-    cfg_replace_option external.authentication.userIdPattern $EXTERNAL_AUTH_USER_ID_PATTERN $ALFRESCO_GLOBAL_PROPERTIES
+    cfg_replace_option external.authentication.userIdPattern "$EXTERNAL_AUTH_USER_ID_PATTERN" $ALFRESCO_GLOBAL_PROPERTIES
   fi
   
 
@@ -208,6 +222,24 @@ function tweak_alfresco {
     cfg_replace_option ldap.synchronization.userIdAttributeName $LDAP_USER_ATTRIBUTENAME $LDAP_CONFIG_FILE
     cfg_replace_option ldap.synchronization.groupMemberAttributeName $LDAP_GROUP_MEMBER_ATTRIBUTENAME $LDAP_CONFIG_FILE
   fi
+
+  if [ "$SOLR_ENABLE" == "true" ]; then
+    cfg_replace_option index.subsystem.name $SOLR_MODULE $ALFRESCO_GLOBAL_PROPERTIES
+    cfg_replace_option solr.host $SOLR_HOST $ALFRESCO_GLOBAL_PROPERTIES
+    cfg_replace_option solr.port "$SOLR_PORT" $ALFRESCO_GLOBAL_PROPERTIES
+    cfg_replace_option solr.port.ssl "$SOLR_PORT_SSL" $ALFRESCO_GLOBAL_PROPERTIES
+    cfg_replace_option solr.secureComms $SOLR_SECURE_COMMS $ALFRESCO_GLOBAL_PROPERTIES
+  fi
+
+
+
+  index.subsystem.name=solr4
+solr.host=solr
+solr.port=8080
+solr.port.ssl=8443
+#solr.max.total.connections=
+#solr.max.host.connections=
+solr.secureComms=none
 
   # content store
   cfg_replace_option dir.contentstore "${CONTENT_STORE}/contentstore" $ALFRESCO_GLOBAL_PROPERTIES
