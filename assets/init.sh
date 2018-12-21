@@ -221,6 +221,7 @@ function tweak_alfresco {
     cfg_replace_option ldap.synchronization.userSearchBase $LDAP_USER_SEARCHBASE $LDAP_CONFIG_FILE
     cfg_replace_option ldap.synchronization.userIdAttributeName $LDAP_USER_ATTRIBUTENAME $LDAP_CONFIG_FILE
     cfg_replace_option ldap.synchronization.groupMemberAttributeName $LDAP_GROUP_MEMBER_ATTRIBUTENAME $LDAP_CONFIG_FILE
+    cfg_replace_option synchronization.import.cron '0 0/15 0/1 * * ?' $ALFRESCO_GLOBAL_PROPERTIES
   fi
 
   if [ "$SOLR_ENABLE" == "true" ]; then
