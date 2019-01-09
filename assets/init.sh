@@ -134,7 +134,7 @@ function tweak_alfresco {
 
   cfg_replace_option audit.enabled $AUDIT_ENABLED $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option audit.alfresco-access.enabled $AUDIT_ALFRESCO_ACCESS_ENABLED $ALFRESCO_GLOBAL_PROPERTIES
-
+     
   #alfresco host+proto+port
   cfg_replace_option alfresco.host $ALFRESCO_HOSTNAME $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option alfresco.protocol $ALFRESCO_PROTOCOL $ALFRESCO_GLOBAL_PROPERTIES
@@ -157,8 +157,8 @@ function tweak_alfresco {
 
   cfg_replace_option mail.host $MAIL_HOST $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option mail.port $MAIL_PORT $ALFRESCO_GLOBAL_PROPERTIES
-  cfg_replace_option mail.username $MAIL_USERNAME $ALFRESCO_GLOBAL_PROPERTIES
-  cfg_replace_option mail.password $MAIL_PASSWORD $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.username "$MAIL_USERNAME" $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option mail.password "$MAIL_PASSWORD" $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option mail.from.default $MAIL_FROM_DEFAULT $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option mail.protocol $MAIL_PROTOCOL $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option mail.smtp.auth $MAIL_SMTP_AUTH $ALFRESCO_GLOBAL_PROPERTIES
@@ -222,6 +222,8 @@ function tweak_alfresco {
     cfg_replace_option ldap.synchronization.userIdAttributeName $LDAP_USER_ATTRIBUTENAME $LDAP_CONFIG_FILE
     cfg_replace_option ldap.synchronization.groupMemberAttributeName $LDAP_GROUP_MEMBER_ATTRIBUTENAME $LDAP_CONFIG_FILE
     cfg_replace_option synchronization.import.cron '0 0/15 0/1 * * ?' $ALFRESCO_GLOBAL_PROPERTIES
+    # disabled because bug existing on locking account
+    cfg_replace_option authentication.protection.enabled "false" $ALFRESCO_GLOBAL_PROPERTIES
   fi
 
   if [ "$SOLR_ENABLE" == "true" ]; then
@@ -231,16 +233,6 @@ function tweak_alfresco {
     cfg_replace_option solr.port.ssl "$SOLR_PORT_SSL" $ALFRESCO_GLOBAL_PROPERTIES
     cfg_replace_option solr.secureComms $SOLR_SECURE_COMMS $ALFRESCO_GLOBAL_PROPERTIES
   fi
-
-
-
-  index.subsystem.name=solr4
-solr.host=solr
-solr.port=8080
-solr.port.ssl=8443
-#solr.max.total.connections=
-#solr.max.host.connections=
-solr.secureComms=none
 
   # content store
   cfg_replace_option dir.contentstore "${CONTENT_STORE}/contentstore" $ALFRESCO_GLOBAL_PROPERTIES

@@ -20,7 +20,8 @@ RUN yum update -y && \
                    patch \
                    rsync \
                    supervisor \
-                   wget && \
+                   wget \
+                   less && \
     yum clean all && rm -rf /tmp/* /var/tmp/* /var/cache/yum/*
 
 # install alfresco
