@@ -172,7 +172,7 @@ using environment variables.
 - **SOLR_SECURE_COMMS**: solr secure comms; default = `https` 
 - **AUDIT_ENABLED**: ; default = `false` 
 - **AUDIT_ALFRESCO_ACCESS_ENABLED**: ; default = `false` 
-
+- **ACTIVITIES_FEED_NOTIFIER_ENABLED**: to disabled the global activities notifications ; default = `true` 
 
 ## Upgrading
 TODO: I might be able to add some options that aid in upgrading.  For now

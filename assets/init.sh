@@ -94,6 +94,7 @@ EXTERNAL_AUTH_DEFAULT_ADMINS=${EXTERNAL_AUTH_DEFAULT_ADMINS:-admin}
 EXTERNAL_AUTH_PROXY_HEADER=${EXTERNAL_AUTH_PROXY_HEADER:-X-Alfresco-Remote-User}
 EXTERNAL_AUTH_USER_ID_PATTERN=${EXTERNAL_AUTH_USER_ID_PATTERN:-}
 
+ACTIVITIES_FEED_NOTIFIER_ENABLED=${ACTIVITIES_FEED_NOTIFIER_ENABLED:-true}
 
 LDAP_ENABLED=${LDAP_ENABLED:-false}
 LDAP_KIND=${LDAP_KIND:-ldap}
@@ -111,6 +112,9 @@ CONTENT_STORE=${CONTENT_STORE:-/content}
 
 TOMCAT_CSRF_PATCH="${ALF_HOME}/disable_tomcat_CSRF.patch"
 TOMCAT_CSRF_ENABLED=${TOMCAT_CSRF_ENABLED:-true}
+
+SECURITY_ANY_DENY_DENIES=${SECURITY_ANY_DENY_DENIES:-false}
+
 
 function cfg_replace_option {
   grep "$1" "$3" > /dev/null
@@ -131,6 +135,8 @@ function cfg_replace_option {
 
 function tweak_alfresco {
   ALFRESCO_GLOBAL_PROPERTIES=$CATALINA_HOME/shared/classes/alfresco-global.properties
+  
+  cfg_replace_option security.anyDenyDenies $SECURITY_ANY_DENY_DENIES $ALFRESCO_GLOBAL_PROPERTIES
 
   cfg_replace_option audit.enabled $AUDIT_ENABLED $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option audit.alfresco-access.enabled $AUDIT_ALFRESCO_ACCESS_ENABLED $ALFRESCO_GLOBAL_PROPERTIES
@@ -180,7 +186,7 @@ function tweak_alfresco {
 
   cfg_replace_option nfs.enabled $NFS_ENABLED $ALFRESCO_GLOBAL_PROPERTIES
 
-
+  cfg_replace_option activities.feed.notifier.enabled $ACTIVITIES_FEED_NOTIFIER_ENABLED $ALFRESCO_GLOBAL_PROPERTIES
 
   # authentication matrix
   if [ "$LDAP_ENABLED" == "true"  ] && [ "$EXTERNAL_AUTH_ENABLED" == "false" ]; then
@@ -233,10 +239,66 @@ function tweak_alfresco {
     cfg_replace_option solr.port.ssl "$SOLR_PORT_SSL" $ALFRESCO_GLOBAL_PROPERTIES
     cfg_replace_option solr.secureComms $SOLR_SECURE_COMMS $ALFRESCO_GLOBAL_PROPERTIES
   fi
+  
+  # CONFIG OCR
+  cfg_replace_option ocr.script "/alfresco/ocr.sh" $ALFRESCO_GLOBAL_PROPERTIES
+
+  #GS executable
+  cfg_replace_option ghostscript.exe gs $ALFRESCO_GLOBAL_PROPERTIES
+  
+  #Tesseract executable
+  cfg_replace_option tesseract.exe tesseract $ALFRESCO_GLOBAL_PROPERTIES
+  
+  # Define a default priority for this transformer
+  cfg_replace_option content.transformer.ocr.tiff.priority 10 $ALFRESCO_GLOBAL_PROPERTIES
+  
+  # List the transformations that are supported
+  cfg_replace_option content.transformer.ocr.tiff.extensions.tiff.txt.supported true $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option content.transformer.ocr.tiff.extensions.tiff.txt.priority 10 $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option content.transformer.ocr.tiff.extensions.jpg.txt.supported true $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option content.transformer.ocr.tiff.extensions.jpg.txt.priority 10 $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option content.transformer.ocr.tiff.extensions.png.txt.supported true $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option content.transformer.ocr.tiff.extensions.png.txt.priority 10 $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option content.transformer.ocr.tiff.extensions.gif.txt.supported true $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option content.transformer.ocr.tiff.extensions.gif.txt.priority 10 $ALFRESCO_GLOBAL_PROPERTIES
+  
+  # Define a default priority for this transformer
+  cfg_replace_option content.transformer.pdf.tiff.available true $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option content.transformer.pdf.tiff.priority 10 $ALFRESCO_GLOBAL_PROPERTIES
+  # List the transformations that are supported
+  cfg_replace_option content.transformer.pdf.tiff.extensions.pdf.tiff.supported true $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option content.transformer.pdf.tiff.extensions.pdf.tiff.priority 10 $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option content.transformer.complex.Pdf2OCR.available true $ALFRESCO_GLOBAL_PROPERTIES
+  # Commented to be compatible with Alfresco 5.x
+  # content.transformer.complex.Pdf2OCR.failover ocr.pdf
+  cfg_replace_option content.transformer.complex.Pdf2OCR.pipeline "pdf.tiff|tiff|ocr.tiff" $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option content.transformer.complex.Pdf2OCR.extensions.pdf.txt.supported true $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option content.transformer.complex.Pdf2OCR.extensions.pdf.txt.priority 10 $ALFRESCO_GLOBAL_PROPERTIES
+  # Disable the OOTB transformers
+  cfg_replace_option content.transformer.double.ImageMagick.extensions.pdf.tiff.supported false $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option content.transformer.complex.PDF.Image.extensions.pdf.tiff.supported false $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option content.transformer.ImageMagick.extensions.pdf.tiff.supported false $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option content.transformer.PdfBox.extensions.pdf.txt.supported false $ALFRESCO_GLOBAL_PROPERTIES
+  cfg_replace_option content.transformer.TikaAuto.extensions.pdf.txt.supported false $ALFRESCO_GLOBAL_PROPERTIES
+  # END CONFIG OCR
+  
 
   # content store
   cfg_replace_option dir.contentstore "${CONTENT_STORE}/contentstore" $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option dir.contentstore.deleted "${CONTENT_STORE}/contentstore.deleted" $ALFRESCO_GLOBAL_PROPERTIES
+}
+
+
+function tweak_log4j {
+  
+  ALFRESCO_LOG4J_PROPERTIES=$ALF_HOME/tomcat/webapps/alfresco/WEB-INF/classes/log4j.properties
+  SHARE_LOG4J_PROPERTIES=$ALF_HOME/tomcat/webapps/share/WEB-INF/classes/log4j.properties
+  SOLR_LOG4J_PROPERTIES=$ALF_HOME/solr4/log4j-solr.properties
+
+  cfg_replace_option log4j.rootLogger "error, Console" $ALFRESCO_LOG4J_PROPERTIES
+  cfg_replace_option log4j.rootLogger "error, Console" $SHARE_LOG4J_PROPERTIES
+  cfg_replace_option log4j.rootLogger "error, Console" $SOLR_LOG4J_PROPERTIES
+  
 }
 
 tweak_alfresco
@@ -268,6 +330,10 @@ if [ "$TOMCAT_CSRF_ENABLED" == "false" ] && [ -f "$TOMCAT_CSRF_PATCH" ] ;then
   patch -Np0 < $TOMCAT_CSRF_PATCH
   [ $? == 0 ] && mv "$TOMCAT_CSRF_PATCH" "${TOMCAT_CSRF_PATCH}.done"
 fi
+
+echo -e "\nCATALINA_OUT=/dev/stdout\nexport CATALINA_OUT" >> $ALF_HOME/tomcat/bin/setenv.sh
+
+tweak_log4j
 
 # start alfresco
 $ALF_HOME/tomcat/scripts/ctl.sh start

@@ -1,0 +1,132 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+<!-- Licensed to the Apache Software Foundation (ASF) under one or more contributor 
+     license agreements. See the NOTICE file distributed with this work for additional 
+     information regarding copyright ownership. The ASF licenses this file to 
+     You under the Apache License, Version 2.0 (the "License"); you may not use 
+     this file except in compliance with the License. You may obtain a copy of 
+     the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required 
+     by applicable law or agreed to in writing, software distributed under the 
+     License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS 
+     OF ANY KIND, either express or implied. See the License for the specific 
+     language governing permissions and limitations under the License. -->
+<beans>
+
+     <!-- Transforms from TIFF to plain text using Tesseract
+           and a custom script -->
+     <bean id="transformer.worker.ocr.tiff"
+          class="org.alfresco.repo.content.transform.RuntimeExecutableContentTransformerWorker">
+          <property name="mimetypeService">
+               <ref bean="mimetypeService" />
+          </property>
+          <property name="checkCommand">
+               <bean class="org.alfresco.util.exec.RuntimeExec">
+                    <property name="commandsAndArguments">
+                         <map>
+                              <entry key=".*">
+                                   <list>
+                                        <value>${tesseract.exe}</value>
+                                        <value>-v</value>
+                                   </list>
+                              </entry>
+                         </map>
+                    </property>
+                    <property name="errorCodes">
+                         <value>2</value>
+                    </property>
+               </bean>
+          </property>
+
+          <property name="transformCommand">
+               <bean class="org.alfresco.util.exec.RuntimeExec">
+                    <property name="commandsAndArguments">
+                         <map>
+                              <entry key=".*">
+                                   <list>
+                                        <value>${ocr.script}</value>
+                                        <value>${source}</value>
+                                        <value>${target}</value>
+                                   </list>
+                              </entry>
+                         </map>
+                    </property>
+                    <property name="errorCodes">
+                         <value>1,2</value>
+                    </property>
+                    <property name="waitForCompletion">
+                         <value>true</value>
+                    </property>
+               </bean>
+          </property>
+          <property name="transformerConfig">
+               <ref bean="transformerConfig" />
+          </property>
+     </bean>
+
+     <bean id="transformer.ocr.tiff"
+          class="org.alfresco.repo.content.transform.ProxyContentTransformer"
+          parent="baseContentTransformer">
+          <property name="worker">
+               <ref bean="transformer.worker.ocr.tiff" />
+          </property>
+     </bean>
+
+     <!-- Transforms from PDF to TIFF using Ghostscript -->
+     <bean id="transformer.worker.pdf.tiff"
+          class="org.alfresco.repo.content.transform.RuntimeExecutableContentTransformerWorker">
+          <property name="mimetypeService">
+               <ref bean="mimetypeService" />
+          </property>
+          <property name="checkCommand">
+               <bean name="transformer.ImageMagick.CheckCommand" class="org.alfresco.util.exec.RuntimeExec">
+                    <property name="commandsAndArguments">
+                         <map>
+                              <entry key=".*">
+                                   <list>
+                                        <value>${ghostscript.exe}</value>
+                                        <value>-v</value>
+                                   </list>
+                              </entry>
+                         </map>
+                    </property>
+               </bean>
+          </property>
+
+          <property name="transformCommand">
+               <bean class="org.alfresco.util.exec.RuntimeExec">
+                    <property name="commandsAndArguments">
+                         <map>
+                              <entry key=".*">
+                                   <list>
+                                        <value>${ghostscript.exe}</value>
+                                        <value>-o</value>
+                                        <value>${target}</value>
+                                        <value>-sDEVICE=tiff24nc</value>
+                                        <value>-r300</value>
+                                        <value>${source}</value>
+                                   </list>
+                              </entry>
+                         </map>
+                    </property>
+                    <property name="errorCodes">
+                         <value>1,2</value>
+                    </property>
+                    <property name="waitForCompletion">
+                         <value>true</value>
+                    </property>
+               </bean>
+          </property>
+          <property name="transformerConfig">
+               <ref bean="transformerConfig" />
+          </property>
+     </bean>
+
+     <bean id="transformer.pdf.tiff"
+          class="org.alfresco.repo.content.transform.ProxyContentTransformer"
+          parent="baseContentTransformer">
+          <property name="worker">
+               <ref bean="transformer.worker.pdf.tiff" />
+          </property>
+     </bean>
+
+</beans>
