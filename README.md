@@ -174,6 +174,11 @@ using environment variables.
 - **AUDIT_ALFRESCO_ACCESS_ENABLED**: ; default = `false` 
 - **ACTIVITIES_FEED_NOTIFIER_ENABLED**: to disabled the global activities notifications ; default = `true` 
 
+If you want to override your own config key, you can use  the env **EXTRA_ALFRESCO_GLOBAL_<dot by underscore replaced key name>**
+
+Exemple : if you wan to set My.specific.configKey.data by 'new-data' you must declare environement variable like this : "EXTRA_ALFRESCO_GLOBAL_My_specific_configKey_data=new-data" 
+
+
 ## Upgrading
 TODO: I might be able to add some options that aid in upgrading.  For now
 though, backup, backup, backup, and then follow this guide:

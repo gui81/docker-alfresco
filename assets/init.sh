@@ -286,6 +286,19 @@ function tweak_alfresco {
   # content store
   cfg_replace_option dir.contentstore "${CONTENT_STORE}/contentstore" $ALFRESCO_GLOBAL_PROPERTIES
   cfg_replace_option dir.contentstore.deleted "${CONTENT_STORE}/contentstore.deleted" $ALFRESCO_GLOBAL_PROPERTIES
+
+  # extra global vars config  
+  while IFS='=' read -r name value ; do
+  if [[ $name == 'EXTRA_ALFRESCO_GLOBAL_'* ]]; then
+    # echo "$name" ${!name}
+    key_name=${name#*EXTRA_ALFRESCO_GLOBAL_} # remove prefix 'EXTRA_ALFRESCO_GLOBAL_'
+    # echo "$key_name" ${!name}
+    key=${key_name//_/.}   # convert all '_' to '.'
+    # echo "$key" ${!name}
+    cfg_replace_option "${key}" "${!name}" $ALFRESCO_GLOBAL_PROPERTIES    
+  fi
+  done < <(env)
+  
 }
 
 
