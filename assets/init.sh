@@ -348,9 +348,8 @@ fi
 echo -e "\nCATALINA_OUT=/dev/stdout\nexport CATALINA_OUT" >> $ALF_HOME/tomcat/bin/setenv.sh
 
 
-if [ -d "$TOMCAT_MAX_MEMORY" ]; then
-  sed -i 's/-Xmx1024m/-Xmx'"$TOMCAT_MAX_MEMORY"'/g'  $ALF_HOME/tomcat/scripts/ctl.sh
-fi
+sed -i 's/-Xmx1024m/-Xmx'"$TOMCAT_MAX_MEMORY"'/g'  $ALF_HOME/tomcat/scripts/ctl.sh
+
 tweak_log4j
 
 # start alfresco
