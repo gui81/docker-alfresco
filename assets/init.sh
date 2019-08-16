@@ -112,6 +112,7 @@ CONTENT_STORE=${CONTENT_STORE:-/content}
 
 TOMCAT_CSRF_PATCH="${ALF_HOME}/disable_tomcat_CSRF.patch"
 TOMCAT_CSRF_ENABLED=${TOMCAT_CSRF_ENABLED:-true}
+$TOMCAT_MAX_MEMORY=${TOMCAT_MAX_MEMORY:-1024m}
 
 SECURITY_ANY_DENY_DENIES=${SECURITY_ANY_DENY_DENIES:-false}
 
@@ -346,6 +347,10 @@ fi
 
 echo -e "\nCATALINA_OUT=/dev/stdout\nexport CATALINA_OUT" >> $ALF_HOME/tomcat/bin/setenv.sh
 
+
+if [ -d "$TOMCAT_MAX_MEMORY" ]; then
+  sed -i 's/-Xmx1024m/-Xmx'"$TOMCAT_MAX_MEMORY"'/g'  $ALF_HOME/tomcat/scripts/ctl.sh
+fi
 tweak_log4j
 
 # start alfresco
