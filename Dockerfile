@@ -4,7 +4,8 @@ FROM centos:centos7
 MAINTAINER Lucas Johnson <lucasejohnson@netscape.net>
 
 # install some necessary/desired RPMs and get updates
-RUN yum update -y \
+RUN yum install -y deltarpm \
+    && yum update -y \
     && yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm \
     && yum install -y \
                    cairo \
