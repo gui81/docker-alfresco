@@ -345,7 +345,9 @@ if [ "$TOMCAT_CSRF_ENABLED" == "false" ] && [ -f "$TOMCAT_CSRF_PATCH" ] ;then
   [ $? == 0 ] && mv "$TOMCAT_CSRF_PATCH" "${TOMCAT_CSRF_PATCH}.done"
 fi
 
+
 echo -e "\nCATALINA_OUT=/dev/stdout\nexport CATALINA_OUT" >> $ALF_HOME/tomcat/bin/setenv.sh
+
 
 # fix ctl.sh see https://hub.alfresco.com/t5/alfresco-content-services-hub/default-memory-allocation-issue-in-alfresco-ce-201707-ga-aka-5-2/ba-p/291330
 # and docker friendly see https://www.adaltas.com/fr/2017/10/28/person-met-java-dans-un-containeur/#m%C3%A9moire
