@@ -99,6 +99,8 @@
                               <entry key=".*">
                                    <list>
                                         <value>${ghostscript.exe}</value>
+                                        <value>-dNOPAUSE</value>
+                                        <value>-dBATCH</value>
                                         <value>-o</value>
                                         <value>${target}</value>
                                         <value>-sDEVICE=tiff24nc</value>
