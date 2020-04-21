@@ -14,6 +14,6 @@ mkdir -p $TMPDIR
 echo "OCR from $SOURCE to $TARGET" >> /alfresco/alfresco.log
 cp -f $SOURCE $TMPDIR/$OCRFILE
 # call tesseract and redirect output to $TARGET
-/usr/bin/tesseract $TMPDIR/$OCRFILE ${TARGET%\.*} -psm 1 -l eng+fre
+/usr/bin/tesseract $TMPDIR/$OCRFILE ${TARGET%\.*} -psm 1 -l eng+fra
 
 rm -f $TMPDIR/$OCRFILE

@@ -304,13 +304,15 @@ function tweak_alfresco {
 
 function tweak_log4j {
   
-  ALFRESCO_LOG4J_PROPERTIES=$ALF_HOME/tomcat/webapps/alfresco/WEB-INF/classes/log4j.properties
-  SHARE_LOG4J_PROPERTIES=$ALF_HOME/tomcat/webapps/share/WEB-INF/classes/log4j.properties
+  #ALFRESCO_LOG4J_PROPERTIES=$ALF_HOME/tomcat/webapps/alfresco/WEB-INF/classes/log4j.properties
+  #SHARE_LOG4J_PROPERTIES=$ALF_HOME/tomcat/webapps/share/WEB-INF/classes/log4j.properties
   SOLR_LOG4J_PROPERTIES=$ALF_HOME/solr4/log4j-solr.properties
 
-  cfg_replace_option log4j.rootLogger "error, Console" $ALFRESCO_LOG4J_PROPERTIES
-  cfg_replace_option log4j.rootLogger "error, Console" $SHARE_LOG4J_PROPERTIES
+  #cfg_replace_option log4j.rootLogger "error, Console" $ALFRESCO_LOG4J_PROPERTIES
+  #cfg_replace_option log4j.rootLogger "error, Console" $SHARE_LOG4J_PROPERTIES
   cfg_replace_option log4j.rootLogger "error, Console" $SOLR_LOG4J_PROPERTIES
+  
+  echo "log4j.rootLogger=error, Console" > $ALF_HOME/tomcat/shared/classes/log4j.properties
   
 }
 
@@ -350,7 +352,7 @@ echo -e "\nCATALINA_OUT=/dev/stdout\nexport CATALINA_OUT" >> $ALF_HOME/tomcat/bi
 
 # fix ctl.sh see https://hub.alfresco.com/t5/alfresco-content-services-hub/default-memory-allocation-issue-in-alfresco-ce-201707-ga-aka-5-2/ba-p/291330
 # and docker friendly see https://www.adaltas.com/fr/2017/10/28/person-met-java-dans-un-containeur/#m%C3%A9moire
-sed -i 's/-Xms128m -Xmx1024m -XX:+DisableExplicitGC/-XX:+UseCGroupMemoryLimitForHeap -XX:+UnlockExperimentalVMOptions/g'  $ALF_HOME/tomcat/scripts/ctl.sh
+sed -i 's/-Xms128m -Xmx1024m -XX:+DisableExplicitGC/-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap/g'  $ALF_HOME/tomcat/scripts/ctl.sh
 
 tweak_log4j
 
