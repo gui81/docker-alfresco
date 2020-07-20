@@ -159,6 +159,25 @@ using environment variables.
 - **SHARE_PROTOCOL**: protocol use by share to generate links; default = `http`
 - **SYSTEM_SERVERMODE**: the server running mode for you system; default = `PRODUCTION`
 - **TOMCAT_CSRF_ENABLED**: Disable the tomcat CSRF policy; default = `false`
+- **EXTERNAL_AUTH_ENABLED**: Enable external authentification for SSO; default = `false`
+- **EXTERNAL_AUTH_DEFAULT_ADMINS**: comma separated list of user names who should be considered administrators by default. default = `admin`
+- **EXTERNAL_AUTH_PROXY_HEADER**: The name of the HTTP header that carries the name of a proxied user. default = `X-Alfresco-Remote-User` 
+- **EXTERNAL_AUTH_PROXY_USER_NAME**: The name of the remote user that should be considered the proxy user. Requests made by this user will be made under the identity of the user named in the HTTP Header indicated by the external.authentication.proxyHeader property. If not set, then the HTTP Header indicated by the external.authentication.proxyHeader property is always assumed to carry the user name (alfresco default value is : alfresco-system); default = ``
+- **EXTERNAL_AUTH_USER_ID_PATTERN**: An optional regular expression to be used to extract a user ID from the HTTP header. The portion of the header matched by the first bracketed group in the regular expression will become the user name. If not set (the default), then the entire header contents are assumed to be the proxied user name; default = ``
+- **SOLR_ENABLE**: Enable solr default; default = `false`
+- **SOLR_MODULE**: solr driver; default = `solr4`
+- **SOLR_HOST**: solr host; default = `locahost`
+- **SOLR_POR**: solr port; default = `8080`
+- **SOLR_PORT_SSL**: solr ssl port; default = `8443` 
+- **SOLR_SECURE_COMMS**: solr secure comms; default = `https` 
+- **AUDIT_ENABLED**: ; default = `false` 
+- **AUDIT_ALFRESCO_ACCESS_ENABLED**: ; default = `false` 
+- **ACTIVITIES_FEED_NOTIFIER_ENABLED**: to disabled the global activities notifications ; default = `true` 
+
+If you want to override your own config key, you can use  the env **EXTRA_ALFRESCO_GLOBAL_<dot by underscore replaced key name>**
+
+Exemple : if you wan to set My.specific.configKey.data by 'new-data' you must declare environement variable like this : "EXTRA_ALFRESCO_GLOBAL_My_specific_configKey_data=new-data" 
+
 
 ## Upgrading
 TODO: I might be able to add some options that aid in upgrading.  For now

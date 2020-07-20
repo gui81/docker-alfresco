@@ -4,9 +4,10 @@ FROM centos:centos7
 MAINTAINER Lucas Johnson <lucasejohnson@netscape.net>
 
 # install some necessary/desired RPMs and get updates
-RUN yum update -y && \
-    yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm && \
-    yum install -y \
+RUN yum install -y deltarpm \
+    && yum update -y \
+    && yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm \
+    && yum install -y \
                    cairo \
                    cups-libs \
                    fontconfig \
@@ -20,8 +21,13 @@ RUN yum update -y && \
                    patch \
                    rsync \
                    supervisor \
-                   wget && \
-    yum clean all && rm -rf /tmp/* /var/tmp/* /var/cache/yum/*
+                   wget \
+                   less \
+                   ghostscript \
+                   tesseract \
+                   tesseract-langpack-fra \
+    && yum clean all \
+    && rm -rf /tmp/* /var/tmp/* /var/cache/yum/*
 
 # install alfresco
 COPY assets/install_alfresco.sh /tmp/install_alfresco.sh
@@ -47,6 +53,10 @@ COPY assets/disable_tomcat_CSRF.patch /alfresco/disable_tomcat_CSRF.patch
 # install scripts
 COPY assets/init.sh /alfresco/init.sh
 COPY assets/supervisord.conf /etc/supervisord.conf
+
+# OCR
+COPY assets/ocr.sh /alfresco/ocr.sh
+COPY assets/transformer-context.xml /alfresco/tomcat/shared/classes/alfresco/extension/transformer-context.xml
 
 RUN mkdir -p /alfresco/tomcat/webapps/ROOT
 COPY assets/index.jsp /alfresco/tomcat/webapps/ROOT/
